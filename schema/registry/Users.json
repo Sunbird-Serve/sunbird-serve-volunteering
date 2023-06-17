@@ -1,39 +1,48 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema",
-	"type": "object",
-	"properties": {
-		"Users": {
-			"$ref": "#/definitions/Users"
-		}
-	},
-	"required": ["Users"],
-	"title": "Users",
-	"definitions": {
-		"Users": {
-			"$id": "#/properties/Users",
-			"type": "object",
-			"title": "Users schema",
-			"required": ["name"],
-			"properties": {
-				 "identityDetails": {
-          					"$ref": "#/definitions/IdentityDetails"
-        				},
-                                                           "contactDetails": {
-            					"$ref": "#/definitions/ContactDetails"
-          					},
-                                                            "agencyId": {
-          					"type": "string"
-        					}
-                                                            "status": {
-     					 "type": "string"
-    					}
-                                                            "role": {
-                                                                         "type": "string",
-                                                                         "enum": ["nAdmin", "nCoordinator","vAdmin", "vCoordinator"]
-                                                                      }
-			}
-		}, 
- "IdentityDetails": {
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Users": {
+      "$ref": "#/definitions/Users"
+    }
+  },
+  "required": [
+    "Users"
+  ],
+  "title": "Users",
+  "definitions": {
+    "Users": {
+      "$id": "#/properties/Users",
+      "type": "object",
+      "title": "Users schema",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "identityDetails": {
+          "$ref": "#/definitions/IdentityDetails"
+        },
+        "contactDetails": {
+          "$ref": "#/definitions/ContactDetails"
+        },
+        "agencyId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "nAdmin",
+            "nCoordinator",
+            "vAdmin",
+            "vCoordinator"
+          ]
+        }
+      }
+    },
+    "IdentityDetails": {
       "$id": "#/definitions/IdentityDetails",
       "type": "object",
       "title": "Identity Details",
@@ -61,7 +70,7 @@
         }
       }
     },
-	          "ContactDetails": {
+    "ContactDetails": {
       "$id": "#/definitions/ContactDetails",
       "type": "object",
       "title": "Contact Details",
@@ -160,20 +169,22 @@
         }
       }
     }
-	},
-	"_osConfig": {
-		"ownershipAttributes": [
-			{
-				"email": "/email",
-				"mobile": "/phoneNumber"
-			}
-		],
-		"systemFields": [
-     			 "osCreatedAt",
-      			"osUpdatedAt",
-      			"osCreatedBy",
-     			 "osUpdatedBy"
-    		],
-		"inviteRoles": ["anonymous"]
-	}
+  },
+  "_osConfig": {
+    "ownershipAttributes": [
+      {
+        "email": "/email",
+        "mobile": "/phoneNumber"
+      }
+    ],
+    "systemFields": [
+      "osCreatedAt",
+      "osUpdatedAt",
+      "osCreatedBy",
+      "osUpdatedBy"
+    ],
+    "inviteRoles": [
+      "anonymous"
+    ]
+  }
 }
