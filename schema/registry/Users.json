@@ -32,13 +32,17 @@
           "type": "string"
         },
         "role": {
-          "type": "string",
-          "enum": [
-            "nAdmin",
-            "nCoordinator",
-            "vAdmin",
-            "vCoordinator"
-          ]
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Volunteer",
+              "nAdmin",
+              "nCoordinator",
+              "vAdmin",
+              "vCoordinator"
+            ]
+          }
         }
       }
     },
