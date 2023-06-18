@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "ReferenceChannel": {
+      "$ref": "#/definitions/ReferenceChannel"
+    }
+  },
+  "required": [
+    "ReferenceChannel"
+  ],
+  "title": "ReferenceChannel",
+  "definitions": {
+    "ReferenceChannel": {
+      "$id": "#/properties/ReferenceChannel",
+      "type": "object",
+      "title": "Reference Channel schema",
+      "required": [],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "channelType": {
+          "type": "string",
+          "enum": [
+            "Corporate",
+            "Social Media",
+            "Other"
+          ]
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "ownershipAttributes": [
+      {
+        "email": "/email",
+        "mobile": "/phoneNumber"
+      }
+    ],
+    "systemFields": [
+      "osCreatedAt",
+      "osUpdatedAt",
+      "osCreatedBy",
+      "osUpdatedBy"
+    ],
+    "inviteRoles": [
+      "anonymous"
+    ]
+  }
+}
