@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "UserProfile": {
+      "$ref": "#/definitions/UserProfile"
+    }
+  },
+  "required": [
+    "UserProfile"
+  ],
+  "title": "UserProfile",
+  "definitions": {
+    "UserProfile": {
+      "$id": "#/properties/UserProfile",
+      "type": "object",
+      "title": "The User Profile Schema",
+      "required": [],
+      "properties": {
+        "genericDetails": {
+          "$ref": "#/definitions/GenericDetails"
+        },
+        "userPreference": {
+          "$ref": "#/definitions/UserPreference"
+        },
+        "Skills": {
+          "$ref": "#/definitions/Skills"
+        },
+        "onboardDetails": {
+          "$ref": "#/definitions/OnboardingDetails"
+        },
+        "referenceChannelId": {
+          "type": "string"
+        }
+      }
+    },
+    "GenericDetails": {
+      "$id": "#/definitions/GenericDetails",
+      "type": "object",
+      "title": "Generic Details",
+      "description": "Generic Details",
+      "required": [],
+      "properties": {
+        "qualification": {
+          "type": "string",
+          "enum": [
+            "High School",
+            "Pre University",
+            "Graduate",
+            "Post Graduate",
+            "Professional Degree"
+          ]
+        },
+        "affiliation": {
+          "type": "string"
+        },
+        "employmentStatus": {
+          "type": "string",
+          "enum": [
+            "Full Time",
+            "Part Time",
+            "Self-Employed",
+            "Homemaker",
+            "Student",
+            "Retired",
+            "Not Employed",
+            "Others"
+          ]
+        },
+        "yearsOfExperience": {
+          "type": "string"
+        }
+      }
+    },
+    "UserPreference": {
+      "$id": "#/definitions/UserPreference",
+      "type": "object",
+      "title": "UserPreference",
+      "description": "User Preference",
+      "required": [],
+      "definitions": {
+        "Language": {
+          "type": "string"
+        },
+        "DayPreferred": {
+          "type": "string"
+        },
+        "TimePreferred": {
+          "type": "string"
+        },
+        "InterestArea": {
+          "type": "string"
+        }
+      },
+      "properties": {
+        "language": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Language"
+          }
+        },
+        "dayPreferred": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DayPreferred"
+          }
+        },
+        "timePreferred": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TimePreferred"
+          }
+        },
+        "interestAreas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InterestArea"
+          }
+        }
+      }
+    },
+    "Skills": {
+      "$id": "#/definitions/Skills",
+      "type": "object",
+      "title": "Skills",
+      "description": "Skills",
+      "definitions": {
+        "Skill": {
+          "type": "object",
+          "properties": {
+            "skillName": {
+              "type": "string"
+            },
+            "skillLevel": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "skillName",
+            "skillLevel"
+          ]
+        }
+      },
+      "properties": {
+        "skills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Skill"
+          }
+        }
+      },
+      "OnboardingDetails": {
+        "$id": "#/definitions/OnboardingDetails",
+        "type": "object",
+        "title": "OnboardingDetails",
+        "description": "Onboarding Details",
+        "definitions": {
+          "OnboardStep": {
+            "type": "string"
+          },
+          "OnboardStatus": {
+            "type": "object",
+            "properties": {
+              "onboardStep": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "onboardStep",
+              "status"
+            ]
+          }
+        },
+        "properties": {
+          "onboardStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/OnboardStatus"
+            }
+          },
+          "refreshPeriod": {
+            "type": "string"
+          },
+          "profileCompletion": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "_osConfig": {
+      "privateFields": [
+        "$.identityDetails.dob",
+        "$.identityDetails.identityHolder.type",
+        "$.identityDetails.identityHolder.value",
+        "$.contactDetails.email",
+        "$.contactDetails.mobile",
+        "$.contactDetails.address.plot",
+        "$.contactDetails.address.street",
+        "$.contactDetails.address.landmark",
+        "$.contactDetails.address.locality"
+      ],
+      "internalFields": [],
+      "indexFields": [],
+      "uniqueIndexFields": [],
+      "systemFields": [
+        "osCreatedAt",
+        "osUpdatedAt",
+        "osCreatedBy",
+        "osUpdatedBy"
+      ],
+      "inviteRoles": [
+        "anonymous"
+      ],
+      "ownershipAttributes": [
+        {
+          "email": "/contactDetails/email",
+          "mobile": "/contactDetails/mobile",
+          "userId": "/contactDetails/mobile"
+        }
+      ]
+    }
+  }
+}
