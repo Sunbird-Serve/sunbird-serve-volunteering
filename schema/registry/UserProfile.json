@@ -29,6 +29,9 @@
         "onboardDetails": {
           "$ref": "#/definitions/OnboardingDetails"
         },
+        "consentDetails": {
+          "$ref": "#/definitions/ConsentDetails"
+        },
         "referenceChannelId": {
           "type": "string"
         }
@@ -190,6 +193,30 @@
         }
       }
     },
+"ConsentDetails": {
+      "$id": "#/definitions/ConsentDetails",
+      "type": "object",
+      "title": "Consent Details",
+      "description": "Consent Details",
+      "properties": {
+        "consentGiven": {
+          "type": "boolean"
+        },
+        "consentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "consentDescription": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "consentGiven",
+        "consentDate",
+        "consentDescription"
+      ]
+    }
+  },
     "_osConfig": {
       "privateFields": [
         "$.identityDetails.dob",
