@@ -15,9 +15,7 @@
       "$id": "#/properties/Users",
       "type": "object",
       "title": "Users schema",
-      "required": [
-        "name"
-      ],
+      "required": ["identityDetails","contactDetails","role"],
       "properties": {
         "identityDetails": {
           "$ref": "#/definitions/IdentityDetails"
