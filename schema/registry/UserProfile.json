@@ -34,6 +34,9 @@
 				},
 				"referenceChannelId": {
 					"type": "string"
+				},
+				"volunteeringHours": {
+					"$ref": "#/definitions/VolunteeringHours"
 				}
 			}
 		},
@@ -215,6 +218,22 @@
 					"consentDescription"
 				]
 			}
+		},
+	     "VolunteeringHours": {
+			"$id": "#/definitions/VolunteeringHours",
+			"type": "object",
+			"title": "Volunteering Hours",
+			"description": "Volunteering Hours",
+			"properties": {
+				"totalHours": {
+					"type": "number"
+				},
+				"hoursPerWeek": {
+					"type": "number"
+				}
+			},
+			"required": [
+			]
 		}
 	},
 	"_osConfig": {
