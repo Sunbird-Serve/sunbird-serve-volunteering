@@ -80,4 +80,29 @@ public class RcService {
                 .block();
 
     }
+
+    public ResponseEntity<RcUserResponse> createUser(UserRequest userRequest) {
+        return rcClient.post()
+                .uri("/Users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserResponse.class)
+                .block();
+    }
+
+    public ResponseEntity<RcUserResponse> updateUser(UserRequest userRequest, String userId) {
+        return rcClient.put()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Users/{id}")
+                        .build(userId)
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserResponse.class)
+                .block();
+    }
 }

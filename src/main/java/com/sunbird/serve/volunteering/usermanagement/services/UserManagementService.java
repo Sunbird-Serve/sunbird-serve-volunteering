@@ -45,4 +45,14 @@ public class UserManagementService {
         return ResponseEntity.ok(allUsers);
     }
 
+   
+    public ResponseEntity<RcUserResponse> createUser(UserRequest userRequest, Map<String, String> headers) {
+        return rcService.createUser(userRequest);
+    }
+
+
+    public ResponseEntity<RcUserResponse> updateUser(String userId, UserRequest userRequest, Map<String, String> headers) {
+        return rcService.updateUser(userRequest, userId);
+    }
+
 }
