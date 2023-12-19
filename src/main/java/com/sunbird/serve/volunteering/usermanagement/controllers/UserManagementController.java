@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/serve-volunteering/user")
+@RequestMapping("/user")
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
