@@ -13,7 +13,7 @@ public class ServiceConfig {
     @Bean(name = "rcClient")
     public WebClient rcClient() throws IOException {
         return WebClient.builder()
-                .baseUrl("http://43.204.25.161:8081/api/v1")
+                .baseUrl("http://13.201.8.27:8081/api/v1")
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create().wiretap(true)
                 ))
