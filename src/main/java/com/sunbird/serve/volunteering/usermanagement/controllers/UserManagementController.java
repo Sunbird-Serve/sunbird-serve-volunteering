@@ -1,5 +1,6 @@
 package com.sunbird.serve.volunteering.usermanagement.controllers;
 
+import com.sunbird.serve.volunteering.models.request.UserProfile.UserProfile;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
@@ -64,10 +65,9 @@ public class UserManagementController {
     )
     public ResponseEntity<RcUserResponse> createUser(
             @RequestBody UserRequest userRequest,
-            @Parameter() @RequestHeader Map<String, String> headers){
-                return userManagementService.createUser(userRequest, headers);
-            }
-
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.createUser(userRequest, headers);
+    }
 
 
     @Operation(summary = "Update user", description = "Update a user")
@@ -83,9 +83,18 @@ public class UserManagementController {
     ResponseEntity<RcUserResponse> updateUser(
             @PathVariable String userId,
             @RequestBody UserRequest userRequest,
-            @Parameter() @RequestHeader Map<String, String> headers){
-                return userManagementService.updateUser(userId, userRequest, headers);
-            }
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.updateUser(userId, userRequest, headers);
+    }
+
+
+    @GetMapping("/user-profile/{userId}")
+    public ResponseEntity<UserProfile> getUserProfile(
+            @PathVariable String userId,
+            @RequestHeader Map<String, String> headers
+    ) {
+        return userManagementService.getUserProfile(userId, headers);
+    }
 
 
 }

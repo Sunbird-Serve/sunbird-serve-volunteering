@@ -1,5 +1,6 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
+import com.sunbird.serve.volunteering.models.request.UserProfile.UserProfile;
 import com.sunbird.serve.volunteering.usermanagement.services.RcService;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
@@ -53,6 +54,10 @@ public class UserManagementService {
 
     public ResponseEntity<RcUserResponse> updateUser(String userId, UserRequest userRequest, Map<String, String> headers) {
         return rcService.updateUser(userRequest, userId);
+    }
+
+    public ResponseEntity<UserProfile> getUserProfile(String userId, Map<String, String> headers) {
+        return rcService.getUserProfile(userId);
     }
 
 }
