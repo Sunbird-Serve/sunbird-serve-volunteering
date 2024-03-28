@@ -2,6 +2,7 @@ package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
+import com.sunbird.serve.volunteering.models.request.UserProfile.UserProfile;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
@@ -103,6 +104,18 @@ public class RcService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toEntity(RcUserResponse.class)
+                .block();
+    }
+
+    public ResponseEntity<UserProfile> getUserProfile(String userId) {
+        return rcClient.get()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/UserProfile/{id}")
+                        .build(userId)
+                ))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(UserProfile.class)
                 .block();
     }
 }
