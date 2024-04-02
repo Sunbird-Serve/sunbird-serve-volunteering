@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.request.UserProfile;
+package com.sunbird.serve.volunteering.models.request.UserProfileRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmploymentStatus{
-	private String type;
-	private List<String> jsonMemberEnum;
+public class VolunteeringHours{
+
+    private int totalHours;
+    private int hoursPerWeek;
 }

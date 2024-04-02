@@ -2,7 +2,9 @@ package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
-import com.sunbird.serve.volunteering.models.request.UserProfile.UserProfile;
+import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
+import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.RcUserProfileResponse;
+import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.UserProfile;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
@@ -107,6 +109,17 @@ public class RcService {
                 .block();
     }
 
+    public ResponseEntity<RcUserProfileResponse> createUserProfile(UserProfileRequest userProfileRequest) {
+        return rcClient.post()
+                .uri("/UserProfile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userProfileRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserProfileResponse.class)
+                .block();
+    }
+
     public ResponseEntity<UserProfile> getUserProfile(String userId) {
         return rcClient.get()
                 .uri((uriBuilder -> uriBuilder
@@ -118,4 +131,6 @@ public class RcService {
                 .toEntity(UserProfile.class)
                 .block();
     }
+
+
 }

@@ -1,10 +1,11 @@
 package com.sunbird.serve.volunteering.usermanagement.controllers;
 
-import com.sunbird.serve.volunteering.models.request.UserProfile.UserProfile;
+import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
+import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.RcUserProfileResponse;
+import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.UserProfile;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
-import com.sunbird.serve.volunteering.usermanagement.services.RcService;
 import com.sunbird.serve.volunteering.usermanagement.services.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -87,6 +88,22 @@ public class UserManagementController {
         return userManagementService.updateUser(userId, userRequest, headers);
     }
 
+
+    @Operation(summary = "Create new user profile", description = "Create a user profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created a user", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PostMapping(value = "/",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<RcUserProfileResponse> createUserProfile(
+            @RequestBody UserProfileRequest userProfileRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.createUserProfile(userProfileRequest, headers);
+    }
 
     @GetMapping("/user-profile/{userId}")
     public ResponseEntity<UserProfile> getUserProfile(
