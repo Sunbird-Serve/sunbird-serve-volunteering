@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.request.UserProfile;
+package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillName{
-	private String type;
+public class OnboardStatusItem{
+	private String onboardStep;
+	private String status;
 }

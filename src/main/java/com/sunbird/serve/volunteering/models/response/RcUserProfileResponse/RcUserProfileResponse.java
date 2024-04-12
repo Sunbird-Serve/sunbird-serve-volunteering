@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.request.UserProfile;
+package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DayPreferred{
-	private String type;
-	private Items items;
+public class RcUserProfileResponse{
+	private UserProfile userProfile;
 }

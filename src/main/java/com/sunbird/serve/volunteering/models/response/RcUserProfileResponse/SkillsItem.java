@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.request.UserProfile;
+package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConsentDate{
-	private String format;
-	private String type;
+public class SkillsItem{
+	private String skillName;
+	private String skillLevel;
 }
