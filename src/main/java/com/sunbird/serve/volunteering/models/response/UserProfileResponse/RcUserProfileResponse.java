@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.response.UserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,5 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RcUserProfileResponse{
-	private UserProfile userProfile;
+	private String ver;
+	private long ets;
+	private String id;
+	private Params params;
+	private String responseCode;
 }

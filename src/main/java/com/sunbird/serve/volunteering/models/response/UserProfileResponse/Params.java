@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.response.UserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OnboardStatusItem{
-	private String onboardStep;
+public class Params{
+	private String resmsgid;
+	private String err;
+	private String msgid;
+	private String errmsg;
 	private String status;
 }

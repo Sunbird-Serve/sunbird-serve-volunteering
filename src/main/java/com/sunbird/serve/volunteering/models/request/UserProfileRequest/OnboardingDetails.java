@@ -11,6 +11,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skills{
-	private List<SkillsItem> skills;
+public class OnboardingDetails {
+    private List<OnboardStatus> onboardStatus;
+    private String refreshPeriod;
+    private String profileCompletion;
+
 }

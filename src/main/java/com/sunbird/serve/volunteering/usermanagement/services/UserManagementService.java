@@ -1,11 +1,12 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.RcUserProfileResponse;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.UserProfile;
+
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.User;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,8 +56,8 @@ public class UserManagementService {
         return rcService.createUserProfile(userProfileRequest);
     }
 
-    public ResponseEntity<UserProfile> getUserProfile(String userId, Map<String, String> headers) {
-        return rcService.getUserProfile(userId);
+    public ResponseEntity<UserProfile> getUserProfileById(String userId, Map<String, String> headers) {
+        return ResponseEntity.ok(rcService.getUserProfileById(userId));
     }
 
 }
