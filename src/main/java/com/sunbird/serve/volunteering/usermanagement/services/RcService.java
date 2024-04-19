@@ -3,12 +3,12 @@ package com.sunbird.serve.volunteering.usermanagement.services;
 import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.RcUserProfileResponse;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.UserProfile;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.User;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +109,7 @@ public class RcService {
                 .block();
     }
 
+
     public ResponseEntity<RcUserProfileResponse> createUserProfile(UserProfileRequest userProfileRequest) {
         return rcClient.post()
                 .uri("/UserProfile")
@@ -120,7 +121,7 @@ public class RcService {
                 .block();
     }
 
-    public ResponseEntity<UserProfile> getUserProfile(String userId) {
+    public UserProfile getUserProfileById(String userId) {
         return rcClient.get()
                 .uri((uriBuilder -> uriBuilder
                         .path("/UserProfile/{id}")
@@ -128,9 +129,11 @@ public class RcService {
                 ))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .toEntity(UserProfile.class)
+                .bodyToMono(UserProfile.class)
                 .block();
     }
+
+
 
 
 }

@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.response.UserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OnboardDetails{
+	private String osUpdatedAt;
 	private String profileCompletion;
-	private List<OnboardStatusItem> onboardStatus;
+	private String osCreatedAt;
+	private String osUpdatedBy;
 	private String refreshPeriod;
+	private List<OnboardStatusItem> onboardStatus;
+	private String osCreatedBy;
+	private String osid;
 }

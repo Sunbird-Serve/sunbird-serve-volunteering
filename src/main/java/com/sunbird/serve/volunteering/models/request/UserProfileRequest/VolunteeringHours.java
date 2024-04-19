@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VolunteeringHours{
-
+public class VolunteeringHours {
     private int totalHours;
     private int hoursPerWeek;
 }
