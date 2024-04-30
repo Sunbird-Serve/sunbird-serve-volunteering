@@ -83,7 +83,7 @@ public class UserManagementController {
             @ApiResponse(responseCode = "400", description = "Bad Input"),
             @ApiResponse(responseCode = "500", description = "Server Error")}
     )
-    @PostMapping(value = "/{userId}",
+    @PutMapping(value = "/{userId}",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
