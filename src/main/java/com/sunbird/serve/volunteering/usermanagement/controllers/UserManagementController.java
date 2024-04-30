@@ -28,6 +28,10 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
+    private static String email;
+    private static String volunteerName;
+
+
     @Autowired
     public UserManagementController(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;
@@ -67,6 +71,8 @@ public class UserManagementController {
     public ResponseEntity<RcUserResponse> createUser(
             @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
+        email=userRequest.getContactDetails().getEmail();
+        volunteerName=userRequest.getIdentityDetails().getFullname();
         return userManagementService.createUser(userRequest, headers);
     }
 
@@ -101,7 +107,11 @@ public class UserManagementController {
     public ResponseEntity<RcUserProfileResponse> createUserProfile(
             @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
-        return userManagementService.createUserProfile(userProfileRequest, headers);
+        ResponseEntity<RcUserProfileResponse> responseEntity = userManagementService.createUserProfile(userProfileRequest, headers);
+        if(responseEntity.getStatusCode().is2xxSuccessful()) {
+            userManagementService.sendEmail(email,volunteerName);
+        }
+        return responseEntity;
     }
 
     @GetMapping("/user-profile/{userId}")
@@ -111,6 +121,5 @@ public class UserManagementController {
     ) {
         return userManagementService.getUserProfileById(userId, headers);
     }
-
 
 }
