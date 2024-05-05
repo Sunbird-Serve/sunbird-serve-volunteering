@@ -121,11 +121,11 @@ public class RcService {
                 .block();
     }
 
-    public UserProfile getUserProfileById(String userId) {
+    public UserProfile getUserProfileById(String userProfileId) {
         return rcClient.get()
                 .uri((uriBuilder -> uriBuilder
                         .path("/UserProfile/{id}")
-                        .build(userId)
+                        .build(userProfileId)
                 ))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
@@ -133,7 +133,19 @@ public class RcService {
                 .block();
     }
 
-
+public ResponseEntity<RcUserProfileResponse> updateUserProfile(UserProfileRequest userProfileRequest, String userProfileId) {
+        return rcClient.put()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/UserProfile/{id}")
+                        .build(userProfileId)
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(userProfileRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserProfileResponse.class)
+                .block();
+    }
 
 
 }

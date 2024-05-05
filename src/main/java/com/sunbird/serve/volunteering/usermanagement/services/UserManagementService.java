@@ -63,8 +63,12 @@ public class UserManagementService {
         return rcService.createUserProfile(userProfileRequest);
     }
 
-    public ResponseEntity<UserProfile> getUserProfileById(String userId, Map<String, String> headers) {
-        return ResponseEntity.ok(rcService.getUserProfileById(userId));
+    public ResponseEntity<RcUserProfileResponse> updateUserProfile(String userProfileId, UserProfileRequest userProfileRequest, Map<String, String> headers) {
+        return rcService.updateUserProfile(userProfileRequest, userProfileId);
+    }
+
+    public ResponseEntity<UserProfile> getUserProfileById(String userProfileId, Map<String, String> headers) {
+        return ResponseEntity.ok(rcService.getUserProfileById(userProfileId));
     }
 
     public void sendEmail(String email, String volunteerName) {

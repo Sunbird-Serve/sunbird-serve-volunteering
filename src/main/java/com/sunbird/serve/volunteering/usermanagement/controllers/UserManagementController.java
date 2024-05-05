@@ -114,12 +114,29 @@ public class UserManagementController {
         return responseEntity;
     }
 
-    @GetMapping("/user-profile/{userId}")
+
+    @Operation(summary = "Update user profile", description = "Update user profile details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully updated user profile details", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PutMapping(value = "/user-profile/{userProfileId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    ResponseEntity<RcUserProfileResponse> updateUserProfile(
+            @PathVariable String userProfileId,
+            @RequestBody UserProfileRequest userProfileRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.updateUserProfile(userProfileId, userProfileRequest, headers);
+    }
+    @GetMapping("/user-profile/{userProfileId}")
     public ResponseEntity<UserProfile> getUserProfileById(
-            @PathVariable String userId,
+            @PathVariable String userProfileId,
             @RequestHeader Map<String, String> headers
     ) {
-        return userManagementService.getUserProfileById(userId, headers);
+        return userManagementService.getUserProfileById(userProfileId, headers);
     }
 
 }
