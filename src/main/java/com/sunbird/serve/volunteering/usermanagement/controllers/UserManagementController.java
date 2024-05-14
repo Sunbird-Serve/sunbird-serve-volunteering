@@ -28,9 +28,6 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
-    private static String email;
-    private static String volunteerName;
-
 
     @Autowired
     public UserManagementController(UserManagementService userManagementService) {
@@ -71,8 +68,6 @@ public class UserManagementController {
     public ResponseEntity<RcUserResponse> createUser(
             @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
-        email=userRequest.getContactDetails().getEmail();
-        volunteerName=userRequest.getIdentityDetails().getFullname();
         return userManagementService.createUser(userRequest, headers);
     }
 
@@ -107,9 +102,15 @@ public class UserManagementController {
     public ResponseEntity<RcUserProfileResponse> createUserProfile(
             @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
+        ResponseEntity<User> userResponseEntity = userManagementService.getUserById(userProfileRequest.getUserId(), headers);
         ResponseEntity<RcUserProfileResponse> responseEntity = userManagementService.createUserProfile(userProfileRequest, headers);
-        if(responseEntity.getStatusCode().is2xxSuccessful()) {
-            userManagementService.sendEmail(email,volunteerName);
+        if (responseEntity.getStatusCode().is2xxSuccessful()
+                && userResponseEntity.getStatusCode().is2xxSuccessful()
+                && userResponseEntity.getBody() != null
+        ) {
+            String email = userResponseEntity.getBody().getContactDetails().getEmail();
+            String volunteerName = userResponseEntity.getBody().getIdentityDetails().getFullname();
+            userManagementService.sendEmail(email, volunteerName);
         }
         return responseEntity;
     }
