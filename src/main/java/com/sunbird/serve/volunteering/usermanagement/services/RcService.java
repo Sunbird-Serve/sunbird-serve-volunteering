@@ -5,6 +5,9 @@ import com.sunbird.serve.volunteering.models.request.StatusFilter;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
+import com.sunbird.serve.volunteering.models.request.UserProfileSearch;
+import com.sunbird.serve.volunteering.models.request.Filters;
+import com.sunbird.serve.volunteering.models.request.UserIdFilter;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
@@ -130,6 +133,31 @@ public class RcService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(UserProfile.class)
+                .block();
+    }
+
+        public List<UserProfile> getUserProfiles(String userId) {
+                ResponseEntity<List<UserProfile>> responseEntity = listUserProfiles(userId);
+                return responseEntity.getBody();
+    }
+
+    public ResponseEntity<List<UserProfile>> listUserProfiles (String userId) {
+        return rcClient.post()
+                .uri("/UserProfile/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(UserProfileSearch.builder()
+                        .offset(0)
+                        .limit(10)
+                        .filters(Filters.builder()
+                                .userId(UserIdFilter.builder()
+                                .eq(userId)
+                                .build())
+                            .build())
+                        .build()
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntityList(UserProfile.class)
                 .block();
     }
 

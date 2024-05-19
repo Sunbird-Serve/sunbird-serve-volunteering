@@ -140,4 +140,12 @@ public class UserManagementController {
         return userManagementService.getUserProfileById(userProfileId, headers);
     }
 
+    @GetMapping("/user-profile/userId/{userId}")
+    public ResponseEntity<UserProfile> getUserProfileByUserId(
+            @PathVariable String userId,
+            @RequestHeader Map<String, String> headers
+    ) {
+        return userManagementService.getUserProfileByUserId(userId, headers);
+    }
+
 }

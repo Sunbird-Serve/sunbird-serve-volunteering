@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+
 
 
 @Service
@@ -69,6 +72,16 @@ public class UserManagementService {
 
     public ResponseEntity<UserProfile> getUserProfileById(String userProfileId, Map<String, String> headers) {
         return ResponseEntity.ok(rcService.getUserProfileById(userProfileId));
+    }
+
+    public ResponseEntity<UserProfile> getUserProfileByUserId(String userId, Map<String, String> headers) {
+        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
+        List<UserProfile> filteredProfiles = allUserProfiles.stream()
+            .filter(profile -> profile.getUserId().equals(userId))
+            .collect(Collectors.toList());
+    
+        UserProfile userProfile = filteredProfiles.get(0);
+        return ResponseEntity.ok(userProfile);
     }
 
     public void sendEmail(String email, String volunteerName) {
