@@ -52,6 +52,11 @@ public class UserManagementService {
         return ResponseEntity.ok(allUsers);
     }
 
+    public ResponseEntity<List<User>> getUsers(Map<String, String> headers) {
+        List<User> allUsers = rcService.getAllUsers();
+        return ResponseEntity.ok(allUsers);
+    }
+
    
     public ResponseEntity<RcUserResponse> createUser(UserRequest userRequest, Map<String, String> headers) {
         return rcService.createUser(userRequest);

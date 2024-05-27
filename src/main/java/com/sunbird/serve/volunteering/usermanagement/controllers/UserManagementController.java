@@ -55,6 +55,11 @@ public class UserManagementController {
         return userManagementService.getAllUsers(headers);
     }
 
+    @GetMapping("/all-users")
+    public ResponseEntity<List<User>> getUsers(@RequestHeader Map<String, String> headers) {
+        return userManagementService.getUsers(headers);
+    }
+
     @Operation(summary = "Create new user", description = "Create a user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created a user", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),

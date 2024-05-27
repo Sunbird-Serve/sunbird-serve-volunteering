@@ -23,5 +23,5 @@ public class UserProfileRequest {
     private ConsentDetails consentDetails;
     private OnboardingDetails onboardDetails;
     private String referenceChannelId;
-    private VolunteeringHours volunteeringHours;
+    private VolunteeringHoursRequest volunteeringHours;
 }

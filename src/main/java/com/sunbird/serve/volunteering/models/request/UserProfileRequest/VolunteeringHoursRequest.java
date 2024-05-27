@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VolunteeringHours {
+public class VolunteeringHoursRequest {
     private int totalHours;
     private int hoursPerWeek;
 }
