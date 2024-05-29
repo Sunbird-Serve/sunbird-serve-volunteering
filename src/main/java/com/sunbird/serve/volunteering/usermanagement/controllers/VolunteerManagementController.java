@@ -1,6 +1,7 @@
 package com.sunbird.serve.volunteering.usermanagement.controllers;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
+import com.sunbird.serve.volunteering.models.request.UserProfileRequest.CalculateVolHoursRequest;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
 import com.sunbird.serve.volunteering.models.response.User;
@@ -63,4 +64,20 @@ public class VolunteerManagementController {
         return volunteerManagementService.updateVolunteerHours(userId, volHoursRequest, headers);
     } 
 
+ @Operation(summary = "Create Volunteering Hours", description = "Create Volunteering Hours")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created volunteer hours", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PostMapping(value = "/volunteer-hours/create/{userId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    ResponseEntity<VolunteeringHours> createVolunteerHours(
+            @PathVariable String userId,
+            @RequestBody CalculateVolHoursRequest calculateVolHoursRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return volunteerManagementService.calculateVolHours(userId, calculateVolHoursRequest, headers);
+    } 
 }

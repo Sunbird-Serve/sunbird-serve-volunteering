@@ -1,6 +1,7 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
+import com.sunbird.serve.volunteering.models.request.UserProfileRequest.CalculateVolHoursRequest;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
@@ -68,6 +69,32 @@ public class VolunteerManagementService {
     }
 
         UserProfile userProfile = filteredProfiles.get(0);
+        
+        return rcService.updateVolunteerHours(volHoursRequest, userProfile.getOsid());
+    }
+
+
+    public ResponseEntity<VolunteeringHours> calculateVolHours(String userId, CalculateVolHoursRequest calculateVolHoursRequest, Map<String, String> headers) {
+        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
+
+        List<UserProfile> filteredProfiles = allUserProfiles.stream()
+            .filter(profile -> profile.getUserId().equals(userId))
+            .collect(Collectors.toList());
+
+         if (filteredProfiles.isEmpty()) {
+        // Handle the case when no user profile is found
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        UserProfile userProfile = filteredProfiles.get(0);
+
+        ResponseEntity<VolunteeringHours> responseEntity = getVolHrsByUserId(userId, headers);
+
+        VolunteeringHours volunteeringHours = responseEntity.getBody();
+
+        VolunteeringHoursRequest volHoursRequest = new VolunteeringHoursRequest();
+
+        volHoursRequest.setTotalHours(volunteeringHours.getTotalHours());
         
         return rcService.updateVolunteerHours(volHoursRequest, userProfile.getOsid());
     }
