@@ -20,7 +20,7 @@ public class User {
    private String osCreatedBy;
    private String agencyId;
    private String osid;
-   private UserContactDetails contactDetails;
+   private UserContactDetails userContactDetails;
    private List<String> osOwner;
    private IdentityDetails identityDetails;
    private String status;

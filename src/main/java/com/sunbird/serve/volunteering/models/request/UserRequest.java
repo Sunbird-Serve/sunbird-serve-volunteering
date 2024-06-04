@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
+import org.springframework.lang.Nullable;
 import java.util.List;
 
 @Builder
@@ -19,5 +18,8 @@ public class UserRequest {
    private ContactDetails contactDetails;
    private IdentityDetails identityDetails;
    private String status;
+
+   @Nullable
+   private String token;
 
 }
