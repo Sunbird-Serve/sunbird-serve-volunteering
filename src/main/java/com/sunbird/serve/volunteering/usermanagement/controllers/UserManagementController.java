@@ -192,7 +192,7 @@ public class UserManagementController {
                 && userResponseEntity.getStatusCode().is2xxSuccessful()
                 && userResponseEntity.getBody() != null
         ) {
-            String email = userResponseEntity.getBody().getContactDetails().getEmail();
+            String email = userResponseEntity.getBody().getUserContactDetails().getEmail();
             String volunteerName = userResponseEntity.getBody().getIdentityDetails().getFullname();
             userManagementService.sendEmail(email, volunteerName);
         }
