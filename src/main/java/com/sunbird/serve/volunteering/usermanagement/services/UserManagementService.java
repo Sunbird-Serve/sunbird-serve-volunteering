@@ -42,7 +42,7 @@ public class UserManagementService {
     public ResponseEntity<User> getUserByEmail(String email, Map<String, String> headers) {
         List<User> allUsers = rcService.getUsers();
         List<User> emailUsers = allUsers.stream()
-                .filter(s -> s.getContactDetails().getEmail().equalsIgnoreCase(email)).toList();
+                .filter(s -> s.getUserContactDetails().getEmail().equalsIgnoreCase(email)).toList();
         return ResponseEntity.ok(emailUsers.get(0));
     }
 
@@ -114,7 +114,7 @@ public class UserManagementService {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-
     }
+
 
 }

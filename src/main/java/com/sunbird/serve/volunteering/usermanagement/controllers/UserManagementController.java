@@ -1,13 +1,24 @@
 package com.sunbird.serve.volunteering.usermanagement.controllers;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
+import com.sunbird.serve.volunteering.config.JwtUtil;
+import com.sunbird.serve.volunteering.models.request.Address;
+import com.sunbird.serve.volunteering.models.request.ContactDetails;
+import com.sunbird.serve.volunteering.models.request.IdentityDetails;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
+import com.sunbird.serve.volunteering.models.response.UserAddress;
+import com.sunbird.serve.volunteering.models.response.UserContactDetails;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
 import com.sunbird.serve.volunteering.usermanagement.services.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,10 +39,78 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
+    @Autowired
+    FirebaseApp firebaseApp;
 
     @Autowired
     public UserManagementController(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;
+    }
+
+
+    @PostMapping(value = "/login",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserRequest> login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authToken) {
+        try {
+            FirebaseToken firebaseToken = FirebaseAuth.getInstance(firebaseApp).verifyIdToken(authToken);
+
+            ResponseEntity<User> userResponseEntity = userManagementService.getUserByEmail(firebaseToken.getEmail(), null);
+            User user = userResponseEntity.getBody();
+
+            if (user == null || user.getOsid() == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            String token = JwtUtil.createToken(user.getOsid());
+
+            UserRequest userRequest = new UserRequest();
+            userRequest.setRole(user.getRole());
+            userRequest.setAgencyId(user.getAgencyId());
+            userRequest.setContactDetails(mapToContactDetails(user.getUserContactDetails())); // Map UserContactDetails to ContactDetails
+            userRequest.setIdentityDetails(mapToIdentityDetails(user.getIdentityDetails()));
+            userRequest.setStatus(user.getStatus());
+            userRequest.setToken(token);
+
+            return ResponseEntity.ok(userRequest);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    private IdentityDetails mapToIdentityDetails(com.sunbird.serve.volunteering.models.response.IdentityDetails identityDetails) {
+        if(identityDetails == null)
+            return  null;
+
+        IdentityDetails identityDetails1 = new IdentityDetails();
+        identityDetails1.setDob(identityDetails.getDob());
+        identityDetails1.setName(identityDetails.getName());
+        identityDetails1.setFullname(identityDetails.getFullname());
+        identityDetails1.setGender(identityDetails.getGender());
+        identityDetails1.setNationality(identityDetails.getNationality());
+
+        return identityDetails1;
+    }
+
+    private ContactDetails mapToContactDetails(UserContactDetails userContactDetails) {
+        if (userContactDetails == null)
+            return null;
+
+        ContactDetails contactDetails = new ContactDetails();
+        contactDetails.setEmail(userContactDetails.getEmail());
+        contactDetails.setMobile(userContactDetails.getMobile());
+        contactDetails.setAddress(mapToAddress(userContactDetails.getAddress()));
+        return contactDetails;
+    }
+
+    private Address mapToAddress(UserAddress userAddress) {
+        if(userAddress == null)
+            return null;
+
+        Address address = new Address();
+        address.setCity(userAddress.getCity());
+        address.setState(userAddress.getState());
+        address.setCountry(userAddress.getCountry());
+        return address;
     }
 
     @GetMapping("/{userId}")
@@ -71,7 +150,7 @@ public class UserManagementController {
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<RcUserResponse> createUser(
-            @RequestBody UserRequest userRequest,
+                @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return userManagementService.createUser(userRequest, headers);
     }
@@ -113,7 +192,7 @@ public class UserManagementController {
                 && userResponseEntity.getStatusCode().is2xxSuccessful()
                 && userResponseEntity.getBody() != null
         ) {
-            String email = userResponseEntity.getBody().getContactDetails().getEmail();
+            String email = userResponseEntity.getBody().getUserContactDetails().getEmail();
             String volunteerName = userResponseEntity.getBody().getIdentityDetails().getFullname();
             userManagementService.sendEmail(email, volunteerName);
         }
