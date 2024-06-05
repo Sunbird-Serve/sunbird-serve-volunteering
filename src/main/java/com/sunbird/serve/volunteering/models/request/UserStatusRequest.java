@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserStatusRequest {
 
-   private String status;
+   private String userStatus;
    private Boolean send;
 
 }
