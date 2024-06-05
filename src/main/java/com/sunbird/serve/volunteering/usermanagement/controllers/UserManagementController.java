@@ -3,6 +3,7 @@ package com.sunbird.serve.volunteering.usermanagement.controllers;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
+import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
@@ -152,5 +153,22 @@ public class UserManagementController {
     ) {
         return userManagementService.getUserProfileByUserId(userId, headers);
     }
+
+    @Operation(summary = "Update User Status", description = "Update User Status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully updated user status", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PutMapping(value = "/status/update/{userId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    ResponseEntity<User> updateUserStatus(
+            @PathVariable String userId,
+            @RequestBody UserStatusRequest userStatusRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.updateUserStatus(userId, userStatusRequest, headers);
+    } 
 
 }

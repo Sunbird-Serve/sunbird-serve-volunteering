@@ -4,6 +4,7 @@ import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProf
 
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
+import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
@@ -115,6 +116,10 @@ public class UserManagementService {
             e.printStackTrace();
         }
 
+    }
+
+    public ResponseEntity<User> updateUserStatus(String userId, UserStatusRequest userStatusRequest, Map<String, String> headers) {
+        return rcService.updateUserStatus(userId, userStatusRequest);
     }
 
 }
