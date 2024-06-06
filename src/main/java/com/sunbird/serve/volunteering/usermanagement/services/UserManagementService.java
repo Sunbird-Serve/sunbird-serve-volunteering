@@ -41,7 +41,7 @@ public class UserManagementService {
     }
 
     public ResponseEntity<User> getUserByEmail(String email, Map<String, String> headers) {
-        List<User> allUsers = rcService.getUsers();
+        List<User> allUsers = rcService.getAllUsers();
         List<User> emailUsers = allUsers.stream()
                 .filter(s -> s.getContactDetails().getEmail().equalsIgnoreCase(email)).toList();
         return ResponseEntity.ok(emailUsers.get(0));
