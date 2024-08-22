@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.request.UserProfileRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RcUserProfileResponse{
-	private UserProfile userProfile;
+public class Skill {
+    private String skillName;
+    private String skillLevel;
 }

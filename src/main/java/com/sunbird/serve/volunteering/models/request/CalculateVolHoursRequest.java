@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VolunteeringHours{
-
-    private int totalHours;
-    private int hoursPerWeek;
+public class CalculateVolHoursRequest {
+    private Instant startTime;
+    private Instant endTime;
 }

@@ -11,9 +11,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPreference{
-	private List<String> timePreferred;
-	private List<String> dayPreferred;
-	private List<String> interestAreas;
-	private List<String> language;
+public class UserPreference {
+    private List<String> language;
+    private List<String> dayPreferred;
+    private List<String> timePreferred;
+    private List<String> interestArea;
 }

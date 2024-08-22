@@ -5,12 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skills{
-	private List<SkillsItem> skills;
+public class OnboardStatus {
+    private String onboardStep;
+    private String status;
 }

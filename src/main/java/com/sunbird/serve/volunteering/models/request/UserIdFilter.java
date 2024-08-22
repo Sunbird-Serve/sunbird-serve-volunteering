@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VolunteeringHours{
-	private int hoursPerWeek;
-	private int totalHours;
+public class UserIdFilter {
+    private String eq;
 }

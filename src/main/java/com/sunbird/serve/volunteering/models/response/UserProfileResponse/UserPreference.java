@@ -1,4 +1,4 @@
-package com.sunbird.serve.volunteering.models.response.RcUserProfileResponse;
+package com.sunbird.serve.volunteering.models.response.UserProfileResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,8 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPreference{
+	private String osUpdatedAt;
 	private List<String> timePreferred;
+	private List<String> interestArea;
+	private String osCreatedAt;
+	private String osUpdatedBy;
 	private List<String> dayPreferred;
-	private List<String> interestAreas;
+	private String osCreatedBy;
 	private List<String> language;
+	private String osid;
 }

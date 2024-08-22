@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OnboardDetails {
-	private String profileCompletion;
-	private List<OnboardStatusItem> onboardStatus;
-	private String refreshPeriod;
+public class VolunteeringHoursRequest {
+    private int totalHours;
+    private int hoursPerWeek;
 }

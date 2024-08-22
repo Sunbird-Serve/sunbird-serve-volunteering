@@ -1,17 +1,26 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.RcUserProfileResponse;
-import com.sunbird.serve.volunteering.models.response.RcUserProfileResponse.UserProfile;
+
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
+import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.response.User;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
+import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+
 
 
 @Service
@@ -24,12 +33,15 @@ public class UserManagementService {
         this.rcService = rcService;
     }
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     public ResponseEntity<User> getUserById(String userId, Map<String, String> headers) {
         return ResponseEntity.ok(rcService.getUserById(userId));
     }
 
     public ResponseEntity<User> getUserByEmail(String email, Map<String, String> headers) {
-        List<User> allUsers = rcService.getUsers();
+        List<User> allUsers = rcService.getAllUsers();
         List<User> emailUsers = allUsers.stream()
                 .filter(s -> s.getContactDetails().getEmail().equalsIgnoreCase(email)).toList();
         return ResponseEntity.ok(emailUsers.get(0));
@@ -38,6 +50,11 @@ public class UserManagementService {
 
     public ResponseEntity<List<User>> getAllUsers(Map<String, String> headers) {
         List<User> allUsers = rcService.getUsers();
+        return ResponseEntity.ok(allUsers);
+    }
+
+    public ResponseEntity<List<User>> getUsers(Map<String, String> headers) {
+        List<User> allUsers = rcService.getAllUsers();
         return ResponseEntity.ok(allUsers);
     }
 
@@ -55,8 +72,54 @@ public class UserManagementService {
         return rcService.createUserProfile(userProfileRequest);
     }
 
-    public ResponseEntity<UserProfile> getUserProfile(String userId, Map<String, String> headers) {
-        return rcService.getUserProfile(userId);
+    public ResponseEntity<RcUserProfileResponse> updateUserProfile(String userProfileId, UserProfileRequest userProfileRequest, Map<String, String> headers) {
+        return rcService.updateUserProfile(userProfileRequest, userProfileId);
+    }
+
+    public ResponseEntity<UserProfile> getUserProfileById(String userProfileId, Map<String, String> headers) {
+        return ResponseEntity.ok(rcService.getUserProfileById(userProfileId));
+    }
+
+    public ResponseEntity<UserProfile> getUserProfileByUserId(String userId, Map<String, String> headers) {
+        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
+        List<UserProfile> filteredProfiles = allUserProfiles.stream()
+            .filter(profile -> profile.getUserId().equals(userId))
+            .collect(Collectors.toList());
+    
+        UserProfile userProfile = filteredProfiles.get(0);
+        return ResponseEntity.ok(userProfile);
+    }
+
+    public void sendEmail(String email, String volunteerName) {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "utf-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("Welcome Aboard SERVE's Volunteer Squad!");
+            mimeMessageHelper.setText("Dear " + volunteerName +",<br>"+
+                    "<br>" +
+                    "Thank you for registering as a volunteer with us! We are thrilled to have you join us and contribute to our mission of providing quality education for children of our country leveraging technology." +
+                    "<br>" +
+                    "Your dedication and support are invaluable to us, and we're excited to work together to make a positive impact in our community." +
+                    "<br>" +
+                    "As a registered volunteer, you now can nominate a need by browsing through a catalog of needs https://serve-v1.evean.net/vneedtypes. Please take some time to familiarize yourself with these needs to make the most out of your volunteering experience." +
+                    "<br>" +
+                    "We'll be in touch soon with details about upcoming volunteer opportunities and events. In the meantime, if you have any questions or need assistance, feel free to reach out to us at volunteer@evean.net\n" +
+                    "<br><br>" +
+                    "Regards, <br>" +
+                    "Admin",true);
+
+            javaMailSender.send(mimeMessage); //send email
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public ResponseEntity<User> updateUserStatus(String userId, UserStatusRequest userStatusRequest, Map<String, String> headers) {
+        return rcService.updateUserStatus(userId, userStatusRequest);
     }
 
 }

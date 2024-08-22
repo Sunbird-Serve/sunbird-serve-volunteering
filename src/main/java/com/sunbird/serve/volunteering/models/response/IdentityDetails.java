@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Builder
 @Data
@@ -20,6 +21,8 @@ public class IdentityDetails {
    private String osCreatedBy;
    private String osid;
    private String fullname;
+
+   @JsonProperty("Nationality")
    private String Nationality;
 
 }
