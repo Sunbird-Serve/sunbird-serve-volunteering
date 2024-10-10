@@ -18,6 +18,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.Map;
 public class UserManagementController {
 
     private final UserManagementService userManagementService;
+    private static final Logger logger = LoggerFactory.getLogger(UserManagementController.class);
 
 
     @Autowired
@@ -54,6 +57,14 @@ public class UserManagementController {
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers(@RequestHeader Map<String, String> headers) {
         return userManagementService.getAllUsers(headers);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<User>> getUserByStatus(
+            @RequestParam String status,
+            @RequestHeader Map<String, String> headers
+    ) {
+        return userManagementService.getUserByStatus(status, headers);
     }
 
     @GetMapping("/all-users")
@@ -108,16 +119,22 @@ public class UserManagementController {
     public ResponseEntity<RcUserProfileResponse> createUserProfile(
             @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
+        logger.info("Received request to create user profile: {}", userProfileRequest);
+        logger.info("Request headers: {}", headers);
         ResponseEntity<User> userResponseEntity = userManagementService.getUserById(userProfileRequest.getUserId(), headers);
+        logger.info("Response from getUserById: status={}, body={}", userResponseEntity.getStatusCode(), userResponseEntity.getBody());
         ResponseEntity<RcUserProfileResponse> responseEntity = userManagementService.createUserProfile(userProfileRequest, headers);
+        logger.info("Response from createUserProfile: status={}, body={}", responseEntity.getStatusCode(), responseEntity.getBody());
         if (responseEntity.getStatusCode().is2xxSuccessful()
                 && userResponseEntity.getStatusCode().is2xxSuccessful()
                 && userResponseEntity.getBody() != null
         ) {
             String email = userResponseEntity.getBody().getContactDetails().getEmail();
             String volunteerName = userResponseEntity.getBody().getIdentityDetails().getFullname();
+            logger.info("Sending email to {}: {}", email, volunteerName);
             userManagementService.sendEmail(email, volunteerName);
         }
+        logger.info("Returning response: status={}, body={}", responseEntity.getStatusCode(), responseEntity.getBody());
         return responseEntity;
     }
 

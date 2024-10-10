@@ -47,6 +47,13 @@ public class UserManagementService {
         return ResponseEntity.ok(emailUsers.get(0));
     }
 
+    public ResponseEntity<List<User>> getUserByStatus(String status, Map<String, String> headers) {
+        List<User> allUsers = rcService.getAllUsers();
+        List<User> statusUsers = allUsers.stream()
+                .filter(s -> s.getStatus().equalsIgnoreCase(status)).toList();
+        return ResponseEntity.ok(statusUsers);
+    }
+
 
     public ResponseEntity<List<User>> getAllUsers(Map<String, String> headers) {
         List<User> allUsers = rcService.getUsers();
