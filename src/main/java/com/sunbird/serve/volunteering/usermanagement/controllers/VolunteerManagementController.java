@@ -1,17 +1,10 @@
 package com.sunbird.serve.volunteering.usermanagement.controllers;
 
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.CalculateVolHoursRequest;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
-import com.sunbird.serve.volunteering.models.response.User;
-import com.sunbird.serve.volunteering.models.request.UserRequest;
-import com.sunbird.serve.volunteering.models.response.RcUserResponse;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
-import com.sunbird.serve.volunteering.usermanagement.services.UserManagementService;
+import com.sunbird.serve.volunteering.models.VolunteerHours.UpdateVolunteeringHoursRequest;
+import com.sunbird.serve.volunteering.models.VolunteerHours.VolunteeringHours;
 import com.sunbird.serve.volunteering.usermanagement.services.VolunteerManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/volunteer")
 public class VolunteerManagementController {
 
     private final VolunteerManagementService volunteerManagementService;
@@ -38,46 +29,67 @@ public class VolunteerManagementController {
         this.volunteerManagementService = volunteerManagementService;
     }
 
-    @GetMapping("volunteer-hours/read/{userId}")
-    public ResponseEntity<VolunteeringHours> getVolHrsByUserId(
+    @GetMapping("/volunteer-hours/{userId}")
+    public ResponseEntity<String> getVolunteerHoursByUserId(
             @PathVariable String userId,
             @RequestHeader Map<String, String> headers
     ) {
-        return volunteerManagementService.getVolHrsByUserId(userId, headers);
+        Double totalHours = volunteerManagementService.getVolunteerHoursByUserId(userId, headers);
+        if (totalHours == 0) {
+            return ResponseEntity.ok("No volunteer hours recorded for user " + userId);
+        } else {
+            return ResponseEntity.ok("Total volunteer hours for " + userId + " is " + totalHours);
+        }
     }
 
 
-    @Operation(summary = "Update Volunteering Hours", description = "Update Volunteering Hours")
+    @Operation(summary = "Update Volunteer Hours", description = "Update Volunteer Hours")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully updated volunteer hours", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "400", description = "Bad Input"),
             @ApiResponse(responseCode = "500", description = "Server Error")}
     )
-    @PutMapping(value = "/volunteer-hours/update/{userId}",
-            produces = {MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.APPLICATION_JSON_VALUE}
-    )
-    ResponseEntity<VolunteeringHours> updateVolunteerHours(
+    @PutMapping(value = "/volunteer-hours/{userId}/needDeliverableId/{needDeliverableId}")
+    public ResponseEntity<?> updateVolunteerHours(
             @PathVariable String userId,
-            @RequestBody VolunteeringHoursRequest volHoursRequest,
-            @Parameter() @RequestHeader Map<String, String> headers) {
-        return volunteerManagementService.updateVolunteerHours(userId, volHoursRequest, headers);
-    } 
+            @PathVariable String needDeliverableId,
+            @RequestBody UpdateVolunteeringHoursRequest updateVolunteeringHoursRequest,
+            @RequestHeader Map<String, String> headers) {
 
- @Operation(summary = "Create Volunteering Hours", description = "Create Volunteering Hours")
+        if (updateVolunteeringHoursRequest.getDeliveryHours() < 0.0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Delivery hours cannot be negative.");
+        }
+
+        VolunteeringHours updatedVolunteeringHours = volunteerManagementService.updateVolunteerHours(
+                userId,
+                needDeliverableId,
+                updateVolunteeringHoursRequest.getDeliveryHours(),
+                updateVolunteeringHoursRequest.getDeliveryDate(),
+                headers
+        );
+
+        if (updatedVolunteeringHours != null) {
+            return ResponseEntity.ok(updatedVolunteeringHours);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Volunteer hours not found for userId: " + userId + " and needDeliverableId: " + needDeliverableId);
+        }
+    }
+
+    @Operation(summary = "Create Volunteer Hours", description = "Create Volunteer Hours")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully created volunteer hours", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
             @ApiResponse(responseCode = "400", description = "Bad Input"),
             @ApiResponse(responseCode = "500", description = "Server Error")}
     )
-    @PostMapping(value = "/volunteer-hours/create/{userId}",
+    @PostMapping(value = "/volunteer-hours/",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
     ResponseEntity<VolunteeringHours> createVolunteerHours(
-            @PathVariable String userId,
-            @RequestBody CalculateVolHoursRequest calculateVolHoursRequest,
+            @RequestBody VolunteeringHours volunteeringHours,
             @Parameter() @RequestHeader Map<String, String> headers) {
-        return volunteerManagementService.calculateVolHours(userId, calculateVolHoursRequest, headers);
-    } 
+        return volunteerManagementService.createVolunteerHours(volunteeringHours, headers);
+    }
 }
