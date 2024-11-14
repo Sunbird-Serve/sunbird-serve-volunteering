@@ -1,26 +1,17 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.CalculateVolHoursRequest;
-import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
-import com.sunbird.serve.volunteering.models.request.UserRequest;
-import com.sunbird.serve.volunteering.models.response.RcUserResponse;
-import com.sunbird.serve.volunteering.models.response.User;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
-import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import com.sunbird.serve.volunteering.models.VolunteerHours.VolunteeringHours;
+import com.sunbird.serve.volunteering.usermanagement.repositories.VolunteerManagementRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.http.HttpStatus;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,74 +19,68 @@ import org.slf4j.LoggerFactory;
 @Service
 public class VolunteerManagementService {
 
-    private final RcService rcService;
+    private final VolunteerManagementRepository volunteerManagementRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(VolunteerManagementService.class);
 
-     @Autowired
-    public VolunteerManagementService(RcService rcService) {
-        this.rcService = rcService;
+    @Autowired
+    public VolunteerManagementService(VolunteerManagementRepository volunteerManagementRepository) {
+        this.volunteerManagementRepository = volunteerManagementRepository;
     }
 
 
-    public ResponseEntity<VolunteeringHours> getVolHrsByUserId(String userId, Map<String, String> headers) {
-        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
+    public Double getVolunteerHoursByUserId(String userId, Map<String, String> headers) {
+        try {
+            List<VolunteeringHours> volunteeringHoursList = volunteerManagementRepository.findAllByUserId(userId);
+            logger.info("Fetched volunteer hours list for userId {}: {}", userId, volunteeringHoursList);
 
-        List<UserProfile> filteredProfiles = allUserProfiles.stream()
-            .filter(profile -> profile.getUserId().equals(userId))
-            .collect(Collectors.toList());
+            if (volunteeringHoursList.isEmpty()) {
+                return (double) 0; // Return 0 if no hours found
+            }
 
-         if (filteredProfiles.isEmpty()) {
-        // Handle the case when no user profile is found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
+            return (volunteeringHoursList.stream()
+                    .mapToDouble(VolunteeringHours::getDeliveryHours)
+                    .sum());
 
-        UserProfile userProfile = filteredProfiles.get(0);
-
-        logger.info("User Profile Vol Hrs: {}", userProfile);
-
-        return ResponseEntity.ok(userProfile.getVolunteeringHours());
-    }
-
-    public ResponseEntity<VolunteeringHours> updateVolunteerHours(String userId, VolunteeringHoursRequest volHoursRequest, Map<String, String> headers) {
-        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
-
-        List<UserProfile> filteredProfiles = allUserProfiles.stream()
-            .filter(profile -> profile.getUserId().equals(userId))
-            .collect(Collectors.toList());
-
-         if (filteredProfiles.isEmpty()) {
-        // Handle the case when no user profile is found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-
-        UserProfile userProfile = filteredProfiles.get(0);
-        
-        return rcService.updateVolunteerHours(volHoursRequest, userProfile.getOsid());
-    }
-
-
-    public ResponseEntity<VolunteeringHours> calculateVolHours(String userId, CalculateVolHoursRequest calculateVolHoursRequest, Map<String, String> headers) {
-        List<UserProfile> allUserProfiles = rcService.getUserProfiles(userId);
-
-        List<UserProfile> filteredProfiles = allUserProfiles.stream()
-            .filter(profile -> profile.getUserId().equals(userId))
-            .collect(Collectors.toList());
-
-         if (filteredProfiles.isEmpty()) {
-        // Handle the case when no user profile is found
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            logger.error("Error retrieving volunteer hours for userId {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Error retrieving volunteer hours", e);
         }
-
-        UserProfile userProfile = filteredProfiles.get(0);
-
-        ResponseEntity<VolunteeringHours> responseEntity = getVolHrsByUserId(userId, headers);
-
-        VolunteeringHours volunteeringHours = responseEntity.getBody();
-
-        VolunteeringHoursRequest volHoursRequest = new VolunteeringHoursRequest();
-
-        volHoursRequest.setTotalHours(volunteeringHours.getTotalHours());
-        
-        return rcService.updateVolunteerHours(volHoursRequest, userProfile.getOsid());
     }
+
+
+    public VolunteeringHours updateVolunteerHours(String userId, String needDeliverableId, Double deliveryHours, Instant deliveryDate, Map<String, String> headers) {
+        try {
+            Optional<VolunteeringHours> optionalVolunteerHours = volunteerManagementRepository.findByUserIdAndNeedDeliverableId(userId, needDeliverableId);
+
+            if (optionalVolunteerHours.isPresent()) {
+                VolunteeringHours volunteeringHours = optionalVolunteerHours.get();
+                volunteeringHours.setDeliveryHours(deliveryHours);
+                volunteeringHours.setDeliveryDate(deliveryDate);
+
+                VolunteeringHours updatedVolunteeringHours = volunteerManagementRepository.save(volunteeringHours);
+                logger.info("Updated VolunteeringHours for userId {}: {}", userId, updatedVolunteeringHours);
+                return updatedVolunteeringHours;
+            } else {
+                logger.warn("VolunteeringHours not found for userId {} and needDeliverableId {}", userId, needDeliverableId);
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Error updating volunteer hours for userId {} and needDeliverableId {}: {}", userId, needDeliverableId, e.getMessage());
+            return null;
+        }
+    }
+
+
+    public ResponseEntity<VolunteeringHours> createVolunteerHours(VolunteeringHours volunteeringHours, Map<String, String> headers) {
+        try {
+            VolunteeringHours saveVolunteeringHours = volunteerManagementRepository.save(volunteeringHours);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saveVolunteeringHours);
+        } catch (Exception e) {
+            logger.error("Error creating volunteer hours: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
+
