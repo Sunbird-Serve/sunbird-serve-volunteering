@@ -4,6 +4,7 @@ import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyRequest;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
@@ -119,6 +120,17 @@ public class RcService {
                 .uri("/Users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserResponse.class)
+                .block();
+    }
+
+    public ResponseEntity<RcUserResponse> createAgency(AgencyRequest agencyRequest) {
+        return rcClient.post()
+                .uri("/Agency")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(agencyRequest)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toEntity(RcUserResponse.class)

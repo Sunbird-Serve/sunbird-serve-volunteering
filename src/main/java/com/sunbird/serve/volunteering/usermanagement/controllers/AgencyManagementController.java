@@ -2,7 +2,7 @@ package com.sunbird.serve.volunteering.usermanagement.controllers;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.response.Agency;
-import com.sunbird.serve.volunteering.models.request.UserRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyRequest;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
@@ -47,6 +47,20 @@ public class AgencyManagementController {
     }
 
 
-   
+   @Operation(summary = "Create new agency", description = "Create an agency")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created an agency", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PostMapping(value = "/",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<RcUserResponse> createAgency(
+            @RequestBody AgencyRequest agencyRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return agencyManagementService.createAgency(agencyRequest, headers);
+    }
 
 }

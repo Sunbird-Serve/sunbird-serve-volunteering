@@ -2,7 +2,7 @@ package com.sunbird.serve.volunteering.usermanagement.services;
 
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 
-import com.sunbird.serve.volunteering.models.request.UserRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.response.Agency;
@@ -40,5 +40,8 @@ public class AgencyManagementService {
         return ResponseEntity.ok(rcService.getAgencyById(agencyId));
     }
  
+    public ResponseEntity<RcUserResponse> createAgency(AgencyRequest agencyRequest, Map<String, String> headers) {
+        return rcService.createAgency(agencyRequest);
+    }
 
 }
