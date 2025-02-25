@@ -13,6 +13,7 @@ import com.sunbird.serve.volunteering.models.request.Filters;
 import com.sunbird.serve.volunteering.models.request.UserIdFilter;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.User;
+import com.sunbird.serve.volunteering.models.response.Agency;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,18 @@ public class RcService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(User.class)
+                .block();
+    }
+
+     public Agency getAgencyById(String agencyId) {
+        return rcClient.get()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Agency/{id}")
+                        .build(agencyId)
+                ))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Agency.class)
                 .block();
     }
 
