@@ -44,4 +44,10 @@ public class AgencyManagementService {
         return rcService.createAgency(agencyRequest);
     }
 
+    public ResponseEntity<List<Agency>> getAllAgency(Map<String, String> headers) {
+        List<Agency> allAgency = rcService.getAllAgency();
+        return ResponseEntity.ok(allAgency);
+    }
+
+
 }

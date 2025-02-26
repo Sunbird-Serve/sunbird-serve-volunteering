@@ -63,4 +63,9 @@ public class AgencyManagementController {
         return agencyManagementService.createAgency(agencyRequest, headers);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<Agency>> getAllAgency(@RequestHeader Map<String, String> headers) {
+        return agencyManagementService.getAllAgency(headers);
+    }
+
 }

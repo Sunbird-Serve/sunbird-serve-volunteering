@@ -115,6 +115,17 @@ public class RcService {
 
     }
 
+    public List<Agency> getAllAgency() {
+        return rcClient.get()
+                .uri("/Agency")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToFlux(Agency.class)
+                .collectList()
+                .block();
+
+    }
+
     public ResponseEntity<RcUserResponse> createUser(UserRequest userRequest) {
         return rcClient.post()
                 .uri("/Users")
