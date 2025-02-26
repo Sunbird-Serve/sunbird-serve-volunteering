@@ -5,6 +5,7 @@ import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProf
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyUpdateRequest;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
@@ -52,6 +53,13 @@ public class UserManagementService {
         List<User> statusUsers = allUsers.stream()
                 .filter(s -> s.getStatus().equalsIgnoreCase(status)).toList();
         return ResponseEntity.ok(statusUsers);
+    }
+
+    public ResponseEntity<List<User>> getUserByAgencyId(String agencyId, Map<String, String> headers) {
+        List<User> allUsers = rcService.getAllUsers();
+        List<User> agencyUsers = allUsers.stream()
+                .filter(s -> s.getAgencyId().equalsIgnoreCase(agencyId)).toList();
+        return ResponseEntity.ok(agencyUsers);
     }
 
 
@@ -129,4 +137,7 @@ public class UserManagementService {
         return rcService.updateUserStatus(userId, userStatusRequest);
     }
 
+    public ResponseEntity<User> updateUserAgency(String userId, AgencyUpdateRequest agencyUpdateRequest, Map<String, String> headers) {
+        return rcService.updateUserAgency(userId, agencyUpdateRequest);
+    }
 }

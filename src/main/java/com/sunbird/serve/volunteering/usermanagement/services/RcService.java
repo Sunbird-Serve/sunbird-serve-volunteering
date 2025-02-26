@@ -6,6 +6,7 @@ import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProf
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.AgencyRequest;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyUpdateRequest;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
@@ -253,5 +254,18 @@ public ResponseEntity<VolunteeringHours> updateVolunteerHours(VolunteeringHoursR
                 .block();
     }
 
+    public ResponseEntity<User> updateUserAgency(String userId, AgencyUpdateRequest agencyUpdateRequest) {
+        return rcClient.put()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Users/{id}")
+                        .build(userId)
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(agencyUpdateRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(User.class)
+                .block();
+    }
 
 }

@@ -4,6 +4,7 @@ import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProf
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyUpdateRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
@@ -54,6 +55,8 @@ public class UserManagementController {
         return userManagementService.getUserByEmail(email, headers);
     }
 
+   
+
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers(@RequestHeader Map<String, String> headers) {
         return userManagementService.getAllUsers(headers);
@@ -65,6 +68,14 @@ public class UserManagementController {
             @RequestHeader Map<String, String> headers
     ) {
         return userManagementService.getUserByStatus(status, headers);
+    }
+
+    @GetMapping("/agencyId")
+    public ResponseEntity<List<User>> getUserByAgencyId(
+            @RequestParam String agencyId,
+            @RequestHeader Map<String, String> headers
+    ) {
+        return userManagementService.getUserByAgencyId(agencyId, headers);
     }
 
     @GetMapping("/all-users")
@@ -186,6 +197,23 @@ public class UserManagementController {
             @RequestBody UserStatusRequest userStatusRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return userManagementService.updateUserStatus(userId, userStatusRequest, headers);
+    } 
+
+         @Operation(summary = "Update User Agency Details", description = "Update User Agency Details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully updated Agency Details", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")}
+    )
+    @PutMapping(value = "/agencyId/update/{userId}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    ResponseEntity<User> updateUserAgency(
+            @PathVariable String userId,
+            @RequestBody AgencyUpdateRequest agencyUpdateRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.updateUserAgency(userId, agencyUpdateRequest, headers);
     } 
 
 }
