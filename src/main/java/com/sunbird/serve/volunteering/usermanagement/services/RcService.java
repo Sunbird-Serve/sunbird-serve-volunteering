@@ -4,7 +4,9 @@ import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
 import com.sunbird.serve.volunteering.models.request.UserRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyRequest;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
+import com.sunbird.serve.volunteering.models.request.AgencyUpdateRequest;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.VolunteeringHoursRequest;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.VolunteeringHours;
 import com.sunbird.serve.volunteering.models.request.UsersSearchPage;
@@ -13,6 +15,7 @@ import com.sunbird.serve.volunteering.models.request.Filters;
 import com.sunbird.serve.volunteering.models.request.UserIdFilter;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.response.User;
+import com.sunbird.serve.volunteering.models.response.Agency;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
 import lombok.AllArgsConstructor;
@@ -42,6 +45,18 @@ public class RcService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(User.class)
+                .block();
+    }
+
+     public Agency getAgencyById(String agencyId) {
+        return rcClient.get()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Agency/{id}")
+                        .build(agencyId)
+                ))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Agency.class)
                 .block();
     }
 
@@ -101,11 +116,33 @@ public class RcService {
 
     }
 
+    public List<Agency> getAllAgency() {
+        return rcClient.get()
+                .uri("/Agency")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToFlux(Agency.class)
+                .collectList()
+                .block();
+
+    }
+
     public ResponseEntity<RcUserResponse> createUser(UserRequest userRequest) {
         return rcClient.post()
                 .uri("/Users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(RcUserResponse.class)
+                .block();
+    }
+
+    public ResponseEntity<RcUserResponse> createAgency(AgencyRequest agencyRequest) {
+        return rcClient.post()
+                .uri("/Agency")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(agencyRequest)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toEntity(RcUserResponse.class)
@@ -217,5 +254,18 @@ public ResponseEntity<VolunteeringHours> updateVolunteerHours(VolunteeringHoursR
                 .block();
     }
 
+    public ResponseEntity<User> updateUserAgency(String userId, AgencyUpdateRequest agencyUpdateRequest) {
+        return rcClient.put()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Users/{id}")
+                        .build(userId)
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(agencyUpdateRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(User.class)
+                .block();
+    }
 
 }
