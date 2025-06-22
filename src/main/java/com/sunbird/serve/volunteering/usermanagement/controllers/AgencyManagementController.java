@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -58,7 +59,7 @@ public class AgencyManagementController {
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<RcUserResponse> createAgency(
-            @RequestBody AgencyRequest agencyRequest,
+            @Valid @RequestBody AgencyRequest agencyRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return agencyManagementService.createAgency(agencyRequest, headers);
     }

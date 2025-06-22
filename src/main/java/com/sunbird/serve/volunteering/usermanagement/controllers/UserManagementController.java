@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -94,7 +95,7 @@ public class UserManagementController {
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<RcUserResponse> createUser(
-            @RequestBody UserRequest userRequest,
+            @Valid @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return userManagementService.createUser(userRequest, headers);
     }
@@ -112,7 +113,7 @@ public class UserManagementController {
     )
     ResponseEntity<RcUserResponse> updateUser(
             @PathVariable String userId,
-            @RequestBody UserRequest userRequest,
+            @Valid @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return userManagementService.updateUser(userId, userRequest, headers);
     }
@@ -128,7 +129,7 @@ public class UserManagementController {
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
     public ResponseEntity<RcUserProfileResponse> createUserProfile(
-            @RequestBody UserProfileRequest userProfileRequest,
+            @Valid @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         logger.info("Received request to create user profile: {}", userProfileRequest);
         logger.info("Request headers: {}", headers);
@@ -162,7 +163,7 @@ public class UserManagementController {
     )
     ResponseEntity<RcUserProfileResponse> updateUserProfile(
             @PathVariable String userProfileId,
-            @RequestBody UserProfileRequest userProfileRequest,
+            @Valid @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
         return userManagementService.updateUserProfile(userProfileId, userProfileRequest, headers);
     }
