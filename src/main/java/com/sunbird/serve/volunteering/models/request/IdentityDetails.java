@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Builder
 @Data
@@ -22,7 +23,7 @@ public class IdentityDetails {
    private String name;
    private String fullname;
 
-  
+   @JsonProperty("Nationality")
    private String Nationality;
 
 }
