@@ -17,12 +17,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @AllArgsConstructor
 public class IdentityDetails {
 
-   private String gender;Add commentMore actions
+   private String gender;
    private String dob;
    private String name;
    private String fullname;
 
-   @JsonProperty("Nationality")
+  
    private String Nationality;
 
 }
