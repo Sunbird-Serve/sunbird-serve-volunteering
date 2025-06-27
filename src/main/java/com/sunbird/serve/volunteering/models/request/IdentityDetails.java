@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Builder
 @Data
@@ -24,7 +25,7 @@ public class IdentityDetails {
    @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be Male, Female, or Other")
    private String gender;
    
-   private LocalDate dob;
+   private String dob;
    
    @Size(max = 50, message = "Nationality must not exceed 50 characters")
    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Nationality must contain only letters and spaces")
