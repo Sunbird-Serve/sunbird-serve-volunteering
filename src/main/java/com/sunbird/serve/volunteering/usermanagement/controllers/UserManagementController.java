@@ -58,6 +58,14 @@ public class UserManagementController {
 
    
 
+    @GetMapping("/mobile")
+    public ResponseEntity<User> getUserByMobile(
+            @RequestParam String mobile,
+            @RequestHeader Map<String, String> headers
+    ) {
+        return userManagementService.getUserByMobile(mobile, headers);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers(@RequestHeader Map<String, String> headers) {
         return userManagementService.getAllUsers(headers);

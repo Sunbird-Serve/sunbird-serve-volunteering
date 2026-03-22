@@ -85,6 +85,29 @@ public class UserManagementService {
         }
     }
 
+    public ResponseEntity<User> getUserByMobile(String mobile, Map<String, String> headers) {
+        try {
+            log.info("Fetching user by mobile: {}", mobile);
+            List<User> allUsers = rcService.getAllUsers();
+            List<User> mobileUsers = allUsers.stream()
+                    .filter(s -> s.getContactDetails() != null &&
+                               s.getContactDetails().getMobile() != null &&
+                               s.getContactDetails().getMobile().equals(mobile))
+                    .collect(Collectors.toList());
+
+            if (mobileUsers.isEmpty()) {
+                log.warn("No user found with mobile: {}", mobile);
+                return ResponseEntity.notFound().build();
+            }
+
+            log.info("Successfully fetched user by mobile: {}", mobile);
+            return ResponseEntity.ok(mobileUsers.get(0));
+        } catch (Exception e) {
+            log.error("Error fetching user by mobile {}: {}", mobile, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     public ResponseEntity<List<User>> getUserByStatus(String status, Map<String, String> headers) {
         try {
             log.info("Fetching users by status: {}", status);
