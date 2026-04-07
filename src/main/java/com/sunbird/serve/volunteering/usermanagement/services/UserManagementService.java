@@ -88,10 +88,14 @@ public class UserManagementService {
     public ResponseEntity<User> getUserByMobile(String mobile, Map<String, String> headers) {
         try {
             log.info("Fetching user by mobile: {}", mobile);
-            ResponseEntity<List<User>> response = rcService.searchUsersByMobile(mobile);
-            List<User> mobileUsers = response.getBody();
+            List<User> allUsers = rcService.getAllUsers();
+            List<User> mobileUsers = allUsers.stream()
+                    .filter(s -> s.getContactDetails() != null &&
+                               s.getContactDetails().getMobile() != null &&
+                               s.getContactDetails().getMobile().equals(mobile))
+                    .collect(Collectors.toList());
 
-            if (mobileUsers == null || mobileUsers.isEmpty()) {
+            if (mobileUsers.isEmpty()) {
                 log.warn("No user found with mobile: {}", mobile);
                 return ResponseEntity.notFound().build();
             }
