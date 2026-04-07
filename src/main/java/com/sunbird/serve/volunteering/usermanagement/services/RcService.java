@@ -1,5 +1,7 @@
 package com.sunbird.serve.volunteering.usermanagement.services;
 
+import com.sunbird.serve.volunteering.models.request.ContactSearchPage;
+import com.sunbird.serve.volunteering.models.request.MobileFilter;
 import com.sunbird.serve.volunteering.models.request.Status;
 import com.sunbird.serve.volunteering.models.request.StatusFilter;
 import com.sunbird.serve.volunteering.models.request.UserProfileRequest.UserProfileRequest;
@@ -75,6 +77,26 @@ public class RcService {
                         .filters(StatusFilter.builder()
                                 .status(Status.builder()
                                         .eq(status)
+                                        .build())
+                                .build())
+                        .build()
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntityList(User.class)
+                .block();
+    }
+
+    public ResponseEntity<List<User>> searchUsersByMobile(String mobile) {
+        return rcClient.post()
+                .uri("/Users/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(ContactSearchPage.builder()
+                        .offset(0)
+                        .limit(1)
+                        .filters(MobileFilter.builder()
+                                .contactDetailsMobile(Status.builder()
+                                        .eq(mobile)
                                         .build())
                                 .build())
                         .build()
