@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,7 +53,7 @@ class UserManagementControllerTest {
         // Given
         String userId = "test-user-id";
         User user = createTestUser();
-        when(userManagementService.getUserById(userId, any())).thenReturn(ResponseEntity.ok(user));
+        when(userManagementService.getUserById(anyString(), any())).thenReturn(ResponseEntity.ok(user));
 
         // When & Then
         mockMvc.perform(get("/user/{userId}", userId)
@@ -111,7 +112,7 @@ class UserManagementControllerTest {
         // Given
         String status = "Active";
         List<User> users = Arrays.asList(createTestUser());
-        when(userManagementService.getUserByStatus(status, any())).thenReturn(ResponseEntity.ok(users));
+        when(userManagementService.getUserByStatus(anyString(), any())).thenReturn(ResponseEntity.ok(users));
 
         // When & Then
         mockMvc.perform(get("/user/status")

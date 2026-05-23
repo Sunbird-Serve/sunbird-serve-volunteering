@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +32,9 @@ class UserManagementServiceTest {
 
     @Mock
     private RcService rcService;
+
+    @Mock
+    private UserCacheService userCacheService;
 
     @Mock
     private JavaMailSender javaMailSender;
@@ -67,8 +71,8 @@ class UserManagementServiceTest {
     void getUserByEmail_ShouldReturnUser() {
         // Given
         String email = "test@example.com";
-        List<User> allUsers = Arrays.asList(createTestUser(), createTestUserWithDifferentEmail());
-        when(rcService.getAllUsers()).thenReturn(allUsers);
+        User expectedUser = createTestUser();
+        when(userCacheService.getUserByEmail(email)).thenReturn(Optional.of(expectedUser));
 
         // When
         ResponseEntity<User> response = userManagementService.getUserByEmail(email, headers);
@@ -77,7 +81,7 @@ class UserManagementServiceTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(email, response.getBody().getContactDetails().getEmail());
-        verify(rcService).getAllUsers();
+        verify(userCacheService).getUserByEmail(email);
     }
 
     @Test
@@ -85,7 +89,7 @@ class UserManagementServiceTest {
         // Given
         String status = "Active";
         List<User> allUsers = Arrays.asList(createTestUser(), createInactiveUser());
-        when(rcService.getAllUsers()).thenReturn(allUsers);
+        when(userCacheService.getAllUsers()).thenReturn(allUsers);
 
         // When
         ResponseEntity<List<User>> response = userManagementService.getUserByStatus(status, headers);
@@ -95,7 +99,7 @@ class UserManagementServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         assertEquals(status, response.getBody().get(0).getStatus());
-        verify(rcService).getAllUsers();
+        verify(userCacheService).getAllUsers();
     }
 
     @Test
@@ -104,6 +108,7 @@ class UserManagementServiceTest {
         UserRequest userRequest = createValidUserRequest();
         RcUserResponse expectedResponse = new RcUserResponse();
         when(rcService.createUser(userRequest)).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(expectedResponse));
+        doNothing().when(userCacheService).invalidate();
 
         // When
         ResponseEntity<RcUserResponse> response = userManagementService.createUser(userRequest, headers);
@@ -113,6 +118,7 @@ class UserManagementServiceTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expectedResponse, response.getBody());
         verify(rcService).createUser(userRequest);
+        verify(userCacheService).invalidate();
     }
 
     @Test

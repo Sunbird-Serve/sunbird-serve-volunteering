@@ -19,7 +19,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Serve Volunteering API")
-                        .description("API for managing volunteers, agencies, and user profiles")
+                        .description("API for managing volunteers, agencies, user profiles, and volunteering hours")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Sunbird Serve Team")))
