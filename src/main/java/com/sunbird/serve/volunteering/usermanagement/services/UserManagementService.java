@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -31,10 +32,12 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class UserManagementService {
 
     private final RcService rcService;
+    private final UserCacheService userCacheService;
 
      @Autowired
-    public UserManagementService(RcService rcService) {
+    public UserManagementService(RcService rcService, UserCacheService userCacheService) {
         this.rcService = rcService;
+        this.userCacheService = userCacheService;
     }
 
     @Autowired
@@ -65,20 +68,15 @@ public class UserManagementService {
     public ResponseEntity<User> getUserByEmail(String email, Map<String, String> headers) {
         try {
             log.info("Fetching user by email: {}", email);
-            List<User> allUsers = rcService.getAllUsers();
-            List<User> emailUsers = allUsers.stream()
-                    .filter(s -> s.getContactDetails() != null && 
-                               s.getContactDetails().getEmail() != null &&
-                               s.getContactDetails().getEmail().equalsIgnoreCase(email))
-                    .collect(Collectors.toList());
+            Optional<User> cachedUser = userCacheService.getUserByEmail(email);
             
-            if (emailUsers.isEmpty()) {
+            if (cachedUser.isEmpty()) {
                 log.warn("No user found with email: {}", email);
                 return ResponseEntity.notFound().build();
             }
             
             log.info("Successfully fetched user by email: {}", email);
-            return ResponseEntity.ok(emailUsers.get(0));
+            return ResponseEntity.ok(cachedUser.get());
         } catch (Exception e) {
             log.error("Error fetching user by email {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -88,20 +86,15 @@ public class UserManagementService {
     public ResponseEntity<User> getUserByMobile(String mobile, Map<String, String> headers) {
         try {
             log.info("Fetching user by mobile: {}", mobile);
-            List<User> allUsers = rcService.getAllUsers();
-            List<User> mobileUsers = allUsers.stream()
-                    .filter(s -> s.getContactDetails() != null &&
-                               s.getContactDetails().getMobile() != null &&
-                               s.getContactDetails().getMobile().equals(mobile))
-                    .collect(Collectors.toList());
+            Optional<User> cachedUser = userCacheService.getUserByMobile(mobile);
 
-            if (mobileUsers.isEmpty()) {
+            if (cachedUser.isEmpty()) {
                 log.warn("No user found with mobile: {}", mobile);
                 return ResponseEntity.notFound().build();
             }
 
             log.info("Successfully fetched user by mobile: {}", mobile);
-            return ResponseEntity.ok(mobileUsers.get(0));
+            return ResponseEntity.ok(cachedUser.get());
         } catch (Exception e) {
             log.error("Error fetching user by mobile {}: {}", mobile, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -111,7 +104,7 @@ public class UserManagementService {
     public ResponseEntity<List<User>> getUserByStatus(String status, Map<String, String> headers) {
         try {
             log.info("Fetching users by status: {}", status);
-            List<User> allUsers = rcService.getAllUsers();
+            List<User> allUsers = userCacheService.getAllUsers();
             List<User> statusUsers = allUsers.stream()
                     .filter(s -> s.getStatus() != null && s.getStatus().equalsIgnoreCase(status))
                     .collect(Collectors.toList());
@@ -127,7 +120,7 @@ public class UserManagementService {
     public ResponseEntity<List<User>> getUserByAgencyId(String agencyId, Map<String, String> headers) {
         try {
             log.info("Fetching users by agency ID: {}", agencyId);
-            List<User> allUsers = rcService.getAllUsers();
+            List<User> allUsers = userCacheService.getAllUsers();
             List<User> agencyUsers = allUsers.stream()
                     .filter(s -> s.getAgencyId() != null && s.getAgencyId().equalsIgnoreCase(agencyId))
                     .collect(Collectors.toList());
@@ -156,7 +149,7 @@ public class UserManagementService {
     public ResponseEntity<List<User>> getUsers(Map<String, String> headers) {
         try {
             log.info("Fetching all users (alternative method)");
-            List<User> allUsers = rcService.getAllUsers();
+            List<User> allUsers = userCacheService.getAllUsers();
             log.info("Successfully fetched {} users", allUsers.size());
             return ResponseEntity.ok(allUsers);
         } catch (Exception e) {
@@ -172,6 +165,8 @@ public class UserManagementService {
                 userRequest.getContactDetails() != null ? userRequest.getContactDetails().getEmail() : "N/A");
             ResponseEntity<RcUserResponse> response = rcService.createUser(userRequest);
             log.info("Successfully created user with status: {}", response.getStatusCode());
+            // Refresh cache so the new user is immediately searchable
+            userCacheService.invalidate();
             return response;
         } catch (WebClientResponseException e) {
             log.error("Error creating user: {}", e.getMessage());
