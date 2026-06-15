@@ -99,7 +99,7 @@ public class UserManagementController {
     @PostMapping(value = "/",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @PreAuthorize("hasAnyRole('sAdmin', 'nAdmin', 'nCoordinator', 'vAdmin', 'vCoordinator')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RcUserResponse> createUser(
             @Valid @RequestBody UserRequest userRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
@@ -130,7 +130,7 @@ public class UserManagementController {
     @PostMapping(value = "/user-profile",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @PreAuthorize("hasAnyRole('sAdmin', 'nAdmin', 'nCoordinator', 'vAdmin', 'vCoordinator')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RcUserProfileResponse> createUserProfile(
             @Valid @RequestBody UserProfileRequest userProfileRequest,
             @Parameter() @RequestHeader Map<String, String> headers) {
