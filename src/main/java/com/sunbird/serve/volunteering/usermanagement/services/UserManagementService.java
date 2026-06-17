@@ -167,7 +167,7 @@ public class UserManagementService {
             log.info("Successfully created user with status: {}", response.getStatusCode());
             // Refresh cache so the new user is immediately searchable
             userCacheService.invalidate();
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error creating user: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
@@ -183,7 +183,7 @@ public class UserManagementService {
             log.info("Updating user with ID: {}", userId);
             ResponseEntity<RcUserResponse> response = rcService.updateUser(userRequest, userId);
             log.info("Successfully updated user with status: {}", response.getStatusCode());
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error updating user {}: {}", userId, e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
@@ -198,7 +198,7 @@ public class UserManagementService {
             log.info("Creating user profile for user ID: {}", userProfileRequest.getUserId());
             ResponseEntity<RcUserProfileResponse> response = rcService.createUserProfile(userProfileRequest);
             log.info("Successfully created user profile with status: {}", response.getStatusCode());
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error creating user profile: {}", e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
@@ -213,7 +213,7 @@ public class UserManagementService {
             log.info("Updating user profile with ID: {}", userProfileId);
             ResponseEntity<RcUserProfileResponse> response = rcService.updateUserProfile(userProfileRequest, userProfileId);
             log.info("Successfully updated user profile with status: {}", response.getStatusCode());
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error updating user profile {}: {}", userProfileId, e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
@@ -297,7 +297,7 @@ public class UserManagementService {
             log.info("Updating user status for user ID: {} to status: {}", userId, userStatusRequest.getStatus());
             ResponseEntity<User> response = rcService.updateUserStatus(userId, userStatusRequest);
             log.info("Successfully updated user status with status: {}", response.getStatusCode());
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error updating user status for user {}: {}", userId, e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
@@ -312,7 +312,7 @@ public class UserManagementService {
             log.info("Updating user agency for user ID: {} to agency: {}", userId, agencyUpdateRequest.getAgencyId());
             ResponseEntity<User> response = rcService.updateUserAgency(userId, agencyUpdateRequest);
             log.info("Successfully updated user agency with status: {}", response.getStatusCode());
-            return response;
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error updating user agency for user {}: {}", userId, e.getMessage());
             return ResponseEntity.status(e.getStatusCode()).build();
