@@ -4,6 +4,7 @@ import com.sunbird.serve.volunteering.models.response.User;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -39,14 +40,22 @@ public class UserCacheService {
 
     @PostConstruct
     public void init() {
-        refreshCache();
+        // Run initial cache load in background so app starts quickly
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000); // wait 5s for app to fully start
+                refreshCache();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }, "cache-init").start();
     }
 
     /**
      * Refresh cache every 60 seconds.
      * Configurable via application.properties: user.cache.refresh-interval-ms
      */
-    @Scheduled(fixedDelayString = "${user.cache.refresh-interval-ms:60000}")
+    @Scheduled(fixedDelayString = "${user.cache.refresh-interval-ms:60000}", initialDelay = 10000)
     public void refreshCache() {
         try {
             log.info("Refreshing user cache...");
@@ -111,9 +120,10 @@ public class UserCacheService {
     }
 
     /**
-     * Force a cache refresh (e.g., after creating a new user).
+     * Schedule a cache refresh in the background (non-blocking).
+     * Called after user creation so new users are findable on next lookup.
      */
     public void invalidate() {
-        refreshCache();
+        new Thread(this::refreshCache, "cache-invalidate").start();
     }
 }
