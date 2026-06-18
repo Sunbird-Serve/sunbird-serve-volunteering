@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
@@ -33,11 +37,13 @@ public class UserManagementService {
 
     private final RcService rcService;
     private final UserCacheService userCacheService;
+    private final KeycloakAdminService keycloakAdminService;
 
      @Autowired
-    public UserManagementService(RcService rcService, UserCacheService userCacheService) {
+    public UserManagementService(RcService rcService, UserCacheService userCacheService, KeycloakAdminService keycloakAdminService) {
         this.rcService = rcService;
         this.userCacheService = userCacheService;
+        this.keycloakAdminService = keycloakAdminService;
     }
 
     @Autowired
@@ -167,6 +173,10 @@ public class UserManagementService {
             log.info("Successfully created user with status: {}", response.getStatusCode());
             // Refresh cache so the new user is immediately searchable
             userCacheService.invalidate();
+
+            // Assign Keycloak realm roles after successful user creation
+            assignKeycloakRoles(userRequest.getRole());
+
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error creating user: {}", e.getMessage());
@@ -319,6 +329,40 @@ public class UserManagementService {
         } catch (Exception e) {
             log.error("Unexpected error updating user agency for user {}: {}", userId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Extracts the Keycloak user ID (sub claim) from the current security context
+     * and assigns the specified roles via the Keycloak Admin API.
+     * Failures are logged but never propagated — user creation should not fail due to role assignment.
+     */
+    private void assignKeycloakRoles(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return;
+        }
+
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!(authentication instanceof JwtAuthenticationToken jwtAuth)) {
+                log.warn("Cannot assign Keycloak roles: authentication is not JWT-based");
+                return;
+            }
+
+            Jwt jwt = jwtAuth.getToken();
+            String keycloakUserId = jwt.getSubject();
+
+            if (keycloakUserId == null || keycloakUserId.isBlank()) {
+                log.warn("Cannot assign Keycloak roles: JWT has no subject claim");
+                return;
+            }
+
+            log.info("Assigning Keycloak roles {} to user '{}'", roles, keycloakUserId);
+            for (String role : roles) {
+                keycloakAdminService.assignRealmRole(keycloakUserId, role);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to assign Keycloak roles: {}", e.getMessage());
         }
     }
 }
