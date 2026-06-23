@@ -177,6 +177,9 @@ public class UserManagementService {
             // Assign Keycloak realm roles after successful user creation
             assignKeycloakRoles(userRequest.getRole());
 
+            // Set agencyId/agencyType as Keycloak user attributes (mapped to JWT claims)
+            setKeycloakUserAttributes(userRequest.getAgencyId(), null);
+
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         } catch (WebClientResponseException e) {
             log.error("Error creating user: {}", e.getMessage());
@@ -363,6 +366,33 @@ public class UserManagementService {
             }
         } catch (Exception e) {
             log.warn("Failed to assign Keycloak roles: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Sets agencyId and agencyType as Keycloak user attributes on the current user.
+     * These attributes are mapped to JWT claims via protocol mappers.
+     * Failures are logged but never propagated.
+     */
+    private void setKeycloakUserAttributes(String agencyId, String agencyType) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!(authentication instanceof JwtAuthenticationToken jwtAuth)) {
+                log.warn("Cannot set Keycloak attributes: authentication is not JWT-based");
+                return;
+            }
+
+            Jwt jwt = jwtAuth.getToken();
+            String keycloakUserId = jwt.getSubject();
+
+            if (keycloakUserId == null || keycloakUserId.isBlank()) {
+                log.warn("Cannot set Keycloak attributes: JWT has no subject claim");
+                return;
+            }
+
+            keycloakAdminService.setUserAttributes(keycloakUserId, agencyId, agencyType);
+        } catch (Exception e) {
+            log.warn("Failed to set Keycloak user attributes: {}", e.getMessage());
         }
     }
 }

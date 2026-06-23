@@ -145,4 +145,49 @@ public class KeycloakAdminService {
                 .toBodilessEntity()
                 .block();
     }
+
+    /**
+     * Sets user attributes (agencyId, agencyType) on a Keycloak user.
+     * These attributes are mapped to JWT claims via protocol mappers in Keycloak.
+     * Failures are logged but never thrown.
+     */
+    public void setUserAttributes(String keycloakUserId, String agencyId, String agencyType) {
+        try {
+            if (agencyId == null || agencyId.isBlank()) {
+                log.debug("No agencyId provided, skipping Keycloak attribute update for user '{}'", keycloakUserId);
+                return;
+            }
+
+            log.info("Setting Keycloak attributes for user '{}': agencyId='{}', agencyType='{}'",
+                    keycloakUserId, agencyId, agencyType);
+
+            String accessToken = getServiceAccountToken();
+            if (accessToken == null) {
+                log.error("Failed to get service account token, skipping attribute update for user '{}'", keycloakUserId);
+                return;
+            }
+
+            String userUrl = keycloakUrl + "/admin/realms/" + realm + "/users/" + keycloakUserId;
+
+            Map<String, Object> userUpdate = Map.of(
+                    "attributes", Map.of(
+                            "agencyId", List.of(agencyId),
+                            "agencyType", List.of(agencyType != null ? agencyType : "")
+                    )
+            );
+
+            webClient.put()
+                    .uri(userUrl)
+                    .headers(h -> h.setBearerAuth(accessToken))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(userUpdate)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            log.info("Successfully set Keycloak attributes for user '{}'", keycloakUserId);
+        } catch (Exception e) {
+            log.warn("Failed to set Keycloak attributes for user '{}': {}", keycloakUserId, e.getMessage());
+        }
+    }
 }
