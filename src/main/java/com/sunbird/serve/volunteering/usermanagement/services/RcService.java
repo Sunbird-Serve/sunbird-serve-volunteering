@@ -150,6 +150,20 @@ public class RcService {
                 .block();
     }
 
+    public ResponseEntity<Agency> updateAgency(String agencyId, AgencyRequest agencyRequest) {
+        return rcClient.put()
+                .uri((uriBuilder -> uriBuilder
+                        .path("/Agency/{id}")
+                        .build(agencyId)
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(agencyRequest)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(Agency.class)
+                .block();
+    }
+
     public ResponseEntity<RcUserResponse> updateUser(UserRequest userRequest, String userId) {
         return rcClient.put()
                 .uri((uriBuilder -> uriBuilder

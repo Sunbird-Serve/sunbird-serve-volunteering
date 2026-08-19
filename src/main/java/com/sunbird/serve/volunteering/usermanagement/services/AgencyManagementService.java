@@ -49,5 +49,8 @@ public class AgencyManagementService {
         return ResponseEntity.ok(allAgency);
     }
 
+    public ResponseEntity<Agency> updateAgency(String agencyId, AgencyRequest agencyRequest, Map<String, String> headers) {
+        return rcService.updateAgency(agencyId, agencyRequest);
+    }
 
 }
