@@ -6,6 +6,7 @@ import com.sunbird.serve.volunteering.models.request.UserRequest;
 import com.sunbird.serve.volunteering.models.response.RcUserResponse;
 import com.sunbird.serve.volunteering.models.request.UserStatusRequest;
 import com.sunbird.serve.volunteering.models.request.AgencyUpdateRequest;
+import com.sunbird.serve.volunteering.models.response.Agency;
 import com.sunbird.serve.volunteering.models.response.User;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.RcUserProfileResponse;
 import com.sunbird.serve.volunteering.models.response.UserProfileResponse.UserProfile;
@@ -186,6 +187,79 @@ public class UserManagementService {
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch (Exception e) {
             log.error("Unexpected error creating user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Onboards a new user: creates them in Keycloak with a temporary password (their mobile number),
+     * assigns the requested roles and agency attributes, then registers them in RC.
+     * Intended for admin-initiated user creation (nCoordinator, vCoordinator, etc.).
+     * If RC registration fails, the Keycloak user is deleted as a rollback.
+     */
+    public ResponseEntity<RcUserResponse> onboardUser(UserRequest userRequest, Map<String, String> headers) {
+        String email = userRequest.getContactDetails() != null ? userRequest.getContactDetails().getEmail() : null;
+        String mobile = userRequest.getContactDetails() != null ? userRequest.getContactDetails().getMobile() : null;
+        String fullname = userRequest.getIdentityDetails() != null ? userRequest.getIdentityDetails().getFullname() : null;
+        String firstName = fullname;
+        String lastName = "";
+
+        // Split fullname into first/last for Keycloak if space-separated
+        if (fullname != null && fullname.contains(" ")) {
+            int idx = fullname.indexOf(' ');
+            firstName = fullname.substring(0, idx);
+            lastName = fullname.substring(idx + 1);
+        }
+
+        log.info("Onboarding user with email: {}", email);
+
+        // Step 1: Look up agency to derive agencyType
+        String agencyType = null;
+        if (userRequest.getAgencyId() != null && !userRequest.getAgencyId().isBlank()) {
+            try {
+                Agency agency = rcService.getAgencyById(userRequest.getAgencyId());
+                if (agency != null) {
+                    agencyType = agency.getAgencyType();
+                    log.info("Resolved agencyType '{}' from agencyId '{}'", agencyType, userRequest.getAgencyId());
+                } else {
+                    log.warn("Agency not found for agencyId '{}', proceeding without agencyType", userRequest.getAgencyId());
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch agency for agencyId '{}': {}", userRequest.getAgencyId(), e.getMessage());
+            }
+        }
+
+        // Step 2: Create user in Keycloak — password defaults to mobile number
+        String keycloakUserId = keycloakAdminService.createKeycloakUser(email, firstName, lastName, mobile);
+        if (keycloakUserId == null) {
+            log.error("Failed to create Keycloak user for email '{}', aborting onboarding", email);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        // Step 3: Assign roles to the new Keycloak user
+        if (userRequest.getRole() != null) {
+            for (String role : userRequest.getRole()) {
+                keycloakAdminService.assignRealmRole(keycloakUserId, role);
+            }
+        }
+
+        // Step 4: Set agencyId and agencyType on the new Keycloak user
+        keycloakAdminService.setUserAttributes(keycloakUserId, userRequest.getAgencyId(), agencyType);
+
+        // Step 5: Register user in RC
+        try {
+            ResponseEntity<RcUserResponse> rcResponse = rcService.createUser(userRequest);
+            log.info("Successfully onboarded user '{}' with RC status: {}", email, rcResponse.getStatusCode());
+            userCacheService.invalidate();
+            return ResponseEntity.status(rcResponse.getStatusCode()).body(rcResponse.getBody());
+        } catch (WebClientResponseException e) {
+            log.error("RC registration failed for user '{}' after Keycloak creation: {}", email, e.getMessage());
+            // Rollback: delete the Keycloak user to avoid orphaned accounts
+            keycloakAdminService.deleteKeycloakUser(keycloakUserId);
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch (Exception e) {
+            log.error("Unexpected error during RC registration for user '{}': {}", email, e.getMessage(), e);
+            keycloakAdminService.deleteKeycloakUser(keycloakUserId);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

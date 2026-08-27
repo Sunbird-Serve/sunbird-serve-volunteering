@@ -147,6 +147,91 @@ public class KeycloakAdminService {
     }
 
     /**
+     * Creates a new user in Keycloak via the Admin API.
+     * Sets a temporary password equal to the user's mobile number — user must change it on first login.
+     *
+     * @return the new Keycloak user ID, or null if creation failed
+     */
+    public String createKeycloakUser(String email, String firstName, String lastName, String mobile) {
+        try {
+            log.info("Creating Keycloak user with email '{}'", email);
+
+            String accessToken = getServiceAccountToken();
+            if (accessToken == null) {
+                log.error("Failed to get service account token, cannot create Keycloak user '{}'", email);
+                return null;
+            }
+
+            String createUrl = keycloakUrl + "/admin/realms/" + realm + "/users";
+
+            Map<String, Object> credential = Map.of(
+                    "type", "password",
+                    "value", mobile,
+                    "temporary", true
+            );
+
+            Map<String, Object> userRepresentation = new java.util.HashMap<>();
+            userRepresentation.put("username", email);
+            userRepresentation.put("email", email);
+            userRepresentation.put("firstName", firstName != null ? firstName : "");
+            userRepresentation.put("lastName", lastName != null ? lastName : "");
+            userRepresentation.put("enabled", true);
+            userRepresentation.put("credentials", List.of(credential));
+
+            // Keycloak returns 201 with Location: .../users/{newUserId}
+            var response = webClient.post()
+                    .uri(createUrl)
+                    .headers(h -> h.setBearerAuth(accessToken))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(userRepresentation)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            if (response == null || response.getHeaders().getLocation() == null) {
+                log.error("Keycloak user creation response missing Location header for '{}'", email);
+                return null;
+            }
+
+            String location = response.getHeaders().getLocation().toString();
+            String newUserId = location.substring(location.lastIndexOf('/') + 1);
+            log.info("Successfully created Keycloak user '{}' with ID '{}'", email, newUserId);
+            return newUserId;
+
+        } catch (WebClientResponseException e) {
+            log.error("Failed to create Keycloak user '{}': {} - {}", email, e.getStatusCode(), e.getResponseBodyAsString());
+            return null;
+        } catch (Exception e) {
+            log.error("Unexpected error creating Keycloak user '{}': {}", email, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Deletes a Keycloak user by ID. Used for rollback if RC registration fails after Keycloak creation.
+     */
+    public void deleteKeycloakUser(String keycloakUserId) {
+        try {
+            log.warn("Rolling back: deleting Keycloak user '{}'", keycloakUserId);
+            String accessToken = getServiceAccountToken();
+            if (accessToken == null) {
+                log.error("Failed to get service account token, cannot delete Keycloak user '{}'", keycloakUserId);
+                return;
+            }
+            String deleteUrl = keycloakUrl + "/admin/realms/" + realm + "/users/" + keycloakUserId;
+            webClient.delete()
+                    .uri(deleteUrl)
+                    .headers(h -> h.setBearerAuth(accessToken))
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+            log.warn("Successfully deleted Keycloak user '{}' during rollback", keycloakUserId);
+        } catch (Exception e) {
+            log.error("Failed to delete Keycloak user '{}' during rollback: {}", keycloakUserId, e.getMessage());
+        }
+    }
+
+    /**
      * Sets user attributes (agencyId, agencyType) on a Keycloak user.
      * These attributes are mapped to JWT claims via protocol mappers in Keycloak.
      * Failures are logged but never thrown.

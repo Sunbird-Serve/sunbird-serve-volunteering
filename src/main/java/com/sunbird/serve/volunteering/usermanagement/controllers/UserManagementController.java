@@ -106,6 +106,21 @@ public class UserManagementController {
         return userManagementService.createUser(userRequest, headers);
     }
 
+    @Operation(summary = "Onboard a new user", description = "Admin-initiated user creation: registers the user in Keycloak with a temporary password (their mobile number), assigns roles and agency attributes, then registers them in RC.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully onboarded user", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Bad Input"),
+            @ApiResponse(responseCode = "500", description = "Server Error")})
+    @PostMapping(value = "/onboard",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasAnyRole('sAdmin', 'nAdmin')")
+    public ResponseEntity<RcUserResponse> onboardUser(
+            @Valid @RequestBody UserRequest userRequest,
+            @Parameter() @RequestHeader Map<String, String> headers) {
+        return userManagementService.onboardUser(userRequest, headers);
+    }
+
     @Operation(summary = "Update user", description = "Update a user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successfully updated a user", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
