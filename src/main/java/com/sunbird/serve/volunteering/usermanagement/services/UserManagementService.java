@@ -253,7 +253,8 @@ public class UserManagementService {
             userCacheService.invalidate();
             return ResponseEntity.status(rcResponse.getStatusCode()).body(rcResponse.getBody());
         } catch (WebClientResponseException e) {
-            log.error("RC registration failed for user '{}' after Keycloak creation: {}", email, e.getMessage());
+            log.error("RC registration failed for user '{}' after Keycloak creation: {} - Response body: {}",
+                    email, e.getMessage(), e.getResponseBodyAsString());
             // Rollback: delete the Keycloak user to avoid orphaned accounts
             keycloakAdminService.deleteKeycloakUser(keycloakUserId);
             return ResponseEntity.status(e.getStatusCode()).build();
